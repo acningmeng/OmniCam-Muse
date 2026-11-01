@@ -9,7 +9,7 @@
 与仓库，没有手写值：
 
 - `device.json`：机型、系统构建、相机/相册包名与 APK 摘要、SDK jar 摘要与缺失的调色盘类。
-- `mounts.json`：每个 bind 条目的源/目标/门闸/期望状态，运行期拷贝层（7 项）、写进 shared_prefs 的 9 个键、以及
+- `mounts.json`：每个 bind 条目的源/目标/门闸/期望状态，运行期拷贝层（7 项）、写进 shared_prefs 的 12 个键、以及
   Pro 视频 ISZ 补丁的实测行数与列数。
 - `deltas.json`：以本机原厂配置为 base（导出在 `base/` 下并带摘要），X9 Ultra 独有的 22 条条目、preview decision
   的 POP 分支；`untouched` 列出四个跨机型不可合并的配置及原因。
@@ -27,6 +27,11 @@ X8U 上的实际绑定量（`mounts.json` 的 `expectedSummary`）：可以挂�
 合并目录、basictone 合并目录、三份 gamma。跳过 4 项 = `com.qti.tuned.lighthouse*.bin`（本机是 `com.qti.tuned.zf*`，
 绑定等于把别的镜头调优套上来）。另外三个配置（`oplus_camera_config`、`aps`、`algo_switch`）仍是 X9 Ultra 构建，
 比本机原厂旧，默认不 bind；需要时 `touch $MODDIR/enable_stale_config_binds` 才挂。
+
+POP 预览的着色器开关：`retroCamera` 能进但预览一帧就崩在 `PreviewGLThread`（`GLES20Canvas.p0` 里
+`j0` 为空），因为那个 inverse-mask program 只在 `ia.n0.i0()` 为真时构造，而它读的是
+`com.oplus.feature.colorful.screen.torch.config` 的第 2 位。X8 Ultra 的 vendor tag 表没有这个键（取默认 `"0"`），
+`service.sh` 按 X9 Ultra 的同值 `111` 写进 override 配置；缺这一行 POP 进去就 NPE，与 LUT、tone 资源无关。
 
 开关（改完不用重编）：
 
