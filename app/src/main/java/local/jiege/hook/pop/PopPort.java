@@ -21,6 +21,7 @@ public final class PopPort {
             }
         }
         try {
+            if (!new java.io.File("/data/local/tmp/muse_nogeom").exists())
             PopShutterGeometry.install(classLoader);
         } catch (Throwable error) {
             Log.e(TAG, "POP shutter geometry fix unavailable", error);

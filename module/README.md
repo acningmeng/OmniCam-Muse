@@ -9,7 +9,7 @@
 与仓库，没有手写值：
 
 - `device.json`：机型、系统构建、相机/相册包名与 APK 摘要、SDK jar 摘要与缺失的调色盘类。
-- `mounts.json`：每个 bind 条目的源/目标/门闸/期望状态，运行期拷贝层（7 项）、写进 shared_prefs 的 9 个键、以及
+- `mounts.json`：每个 bind 条目的源/目标/门闸/期望状态，运行期拷贝层（7 项）、写进 shared_prefs 的 15 个键、以及
   Pro 视频 ISZ 补丁的实测行数与列数。
 - `deltas.json`：以本机原厂配置为 base（导出在 `base/` 下并带摘要），X9 Ultra 独有的 22 条条目、preview decision
   的 POP 分支；`untouched` 列出四个跨机型不可合并的配置及原因。
@@ -20,13 +20,28 @@
 三方交叉校验（脚本语法、payload 摘要、22 条增量、四个已移植符号名、bind 目标是否真在目标机上）。`tools/port_x8u_config.py`
 已被上面这套流水线取代，仅保留为一次性迁移脚本。
 
-X8U 上的实际绑定量（`mounts.json` 的 `expectedSummary`）：可以挂的 9 项 = 两个已按本机原厂文件重基的配置
+X8U 上的实际绑定量（`mounts.json` 的 `expectedSummary`）：可以挂的 10 项 = 两个已按本机原厂文件重基的配置
 （`camera_unit_config`、`oplus_camera_preview_decision_config.json`）、**X9 Ultra 的 feature 表**
 （`camera_unit_feature_config.protobuf`，本机表里没有 `gr_photo` / `retro_camera` / `tilt.shift` / `ai_composition`
-任何一条，不挂它 GR 与移轴根本不会出现在相机里；它同时是 `UnmountedGuard` 的挂载探针）、音频曲线、meishe LUT
-合并目录、basictone 合并目录、三份 gamma。跳过 4 项 = `com.qti.tuned.lighthouse*.bin`（本机是 `com.qti.tuned.zf*`，
-绑定等于把别的镜头调优套上来）。另外三个配置（`oplus_camera_config`、`aps`、`algo_switch`）仍是 X9 Ultra 构建，
+任何一条，不挂它 GR 与移轴根本不会出现在相机里；它同时是 `UnmountedGuard` 的挂载探针）、**按本机原厂表重建的 APS
+模式表**（`oplus_camera_algo_switch_config`，见下）、音频曲线、meishe LUT 合并目录、basictone 合并目录、三份 gamma。跳过 4 项 = `com.qti.tuned.lighthouse*.bin`（本机是 `com.qti.tuned.zf*`，
+绑定等于把别的镜头调优套上来）。另外两个配置（`oplus_camera_config`、`oplus_camera_aps_config`）仍是 X9 Ultra 构建，
 比本机原厂旧，默认不 bind；需要时 `touch $MODDIR/enable_stale_config_binds` 才挂。
+
+## POP / 理光的快门为什么需要那张 APS 模式表
+
+快门点了没反应，问题不在触摸也不在 LUT。`/odm/etc/camera/config/oplus_camera_algo_switch_config` 是 APS 记录
+「哪些模式有预览结果」的唯一地方：`AlgoSwitchConfig.sPreviewConfigMap` 以 `<mode>@<cameraId>` 为键，查不到就是
+null，APS 不出结果，`BaseMode.m8()` 于是把这次快门拒掉，`bb.g.b` 停在 -1 —— 按钮是可点的、点击也进来了，就是
+不会下发 capture 请求。本机原厂表里 21 个 capture 模式、36 个 preview 模式，`retroCamera` 一个都没有（POP 是
+X8 Ultra 唯一缺的模式），所以 POP 预览能出、快门永远不响应；理光同理由同一张表决定。
+
+`tools/build_x8u_algo_switch_config.py` 把本机原厂表解码（`01 01` 信封 + AES-ECB，key 取自 `libOplusSecurity.so`
++0x7AB）、去掉 `//` 注释，再把 X9 Ultra 表里的 `retroCamera` capture/preview 两个块插到 `common` 之后，输出明文
+JSON。实测：绑定后 POP 与理光都能正常出片（媒体库 `_id` 连续增长）。
+
+这张表必须在**开机时**绑：运行期对 `/odm/etc/camera/config/*` 做 `mount --bind` 会让相机 provider 拿着旧 inode，
+表现为取景黑屏、快门全废；即使绑回原厂文件也一样。改完这张表要 `ksud soft-reboot`，不要热换。
 
 开关（改完不用重编）：
 

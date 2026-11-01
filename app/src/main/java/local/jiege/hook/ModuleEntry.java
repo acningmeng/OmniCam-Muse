@@ -113,6 +113,7 @@ public final class ModuleEntry implements IXposedHookLoadPackage, IXposedHookZyg
             X10FilterPort.installCamera(classLoader);
             HighPixelEffects.installCamera(classLoader);
             TiltShiftCapture.installCamera(classLoader);
+            local.jiege.hook.common.FeatureModeCompat.installCamera(classLoader);
             SeamlessBlurGuard.installCamera(classLoader);
             AiComposition.installCamera(classLoader);
             KeyLaunchMode.installCamera(classLoader);

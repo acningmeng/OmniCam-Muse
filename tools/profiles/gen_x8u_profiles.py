@@ -34,7 +34,7 @@ CONFIGS = [
     ("oplus_camera_preview_decision_config.json", None, "rebased"),
     ("camera_unit_feature_config.protobuf", None, "feature-table"),
     ("oplus_camera_config", "enable_stale_config_binds", "blocked:stale-x9-build"),
-    ("oplus_camera_algo_switch_config", "enable_stale_config_binds", "blocked:stale-x9-build"),
+    ("oplus_camera_algo_switch_config", None, "generated:algo-switch"),
     ("oplus_camera_aps_config", "enable_stale_config_binds", "blocked:stale-x9-build"),
 ]
 GAMMA_NAMES = ["gamma_preview_sdr_conf.json", "gamma_quick_sdr_conf.json", "gamma_preview_hdr_conf.json"]

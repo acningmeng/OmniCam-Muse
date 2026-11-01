@@ -76,6 +76,12 @@ else
     for NAME in camera_unit_config oplus_camera_preview_decision_config.json; do
         bind_file "$MODDIR/payload/$NAME" "/odm/etc/camera/config/$NAME"
     done
+    # APS keeps the list of modes it will produce preview results for, keyed "<mode>@<cameraId>".
+    # POP (retroCamera) is the one mode this device's stock table never lists, so APS answers null,
+    # BaseMode.m8() sees no preview and refuses every shutter press: the button is live, the tap
+    # lands, and no capture request is ever issued. The payload copy is this device's own table with
+    # the X9 Ultra retroCamera capture and preview blocks inserted (tools/build_x8u_algo_switch_config.py).
+    bind_file "$MODDIR/payload/oplus_camera_algo_switch_config" /odm/etc/camera/config/oplus_camera_algo_switch_config
     # The feature table is what actually advertises gr_photo / retro_camera / tilt.shift and
     # ai_composition to the camera; this device's own table has none of them, so the X9 Ultra table is
     # bound as-is. It is also the mount probe UnmountedGuard reads (st_dev differs once bound).
@@ -83,7 +89,7 @@ else
     # These three are still X9 Ultra builds. On a device whose own file is newer they would be a
     # downgrade (fewer vendor tags, lighthouse* sensor names), so they stay off unless asked for.
     if [ -f "$MODDIR/enable_stale_config_binds" ]; then
-        for NAME in oplus_camera_config oplus_camera_algo_switch_config oplus_camera_aps_config; do
+        for NAME in oplus_camera_config oplus_camera_aps_config; do
             bind_file "$MODDIR/payload/$NAME" "/odm/etc/camera/config/$NAME"
         done
     else

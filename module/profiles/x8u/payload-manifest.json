@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "profileId": "pku110-17.0.0.104-camera-7.006.123",
-  "deltasSha256": "dab6a31c31bb629472d2c3843dba735ca4b9af21409cd49a590c04a4f54900e4",
+  "deltasSha256": "ee9c20fbe61eb53ac041efea1a2ae54b78f1fb1096979e2598689998dcc358e7",
   "applied": [
     {
       "target": "payload/camera_unit_config",
@@ -2423,8 +2423,8 @@
     },
     {
       "path": "payload/oplus_camera_algo_switch_config",
-      "bytes": 109976,
-      "sha256": "e2a0578f31bdd23ed64d8332c6249b4435b5f900831f32cc3b7d48cb863a2980"
+      "bytes": 146986,
+      "sha256": "3505d89c55bae3e16da662e10bc31415845c3e58dae37c98133f07778d1feda3"
     },
     {
       "path": "payload/oplus_camera_aps_config",
