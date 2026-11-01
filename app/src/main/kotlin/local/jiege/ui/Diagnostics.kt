@@ -95,11 +95,25 @@ internal class InjectionState(val checks: List<Check>, val health: Health) {
             return InjectionState(checks, health)
         }
 
-        /** The module's camera libraries are bind-mounted over /odm, so they sit on another device. */
-        private fun moduleMounted(): Boolean = try {
-            Os.stat("/odm/lib64/libAlgoInterface.so").st_dev != Os.stat("/odm/lib64").st_dev
-        } catch (_: Exception) {
-            false
+        /**
+         * The module's files are bind-mounted over /odm, so they sit on another device. The probes
+         * cover both layouts: PMA110 binds its libraries into /odm/lib64, PKU110 binds the camera
+         * configuration and resource trees and leaves /odm/lib64 alone (no libBasicTonePhotoX9/X10
+         * to dispatch to, so the router is not installed). Mounted means any one of them moved.
+         */
+        private val MOUNT_PROBES = arrayOf(
+            "/odm/etc/camera/config/camera_unit_feature_config.protobuf",
+            "/odm/etc/camera/config/camera_unit_config",
+            "/odm/etc/camera/gamma_preview_sdr_conf.json",
+            "/odm/lib64/libAlgoInterface.so",
+        )
+
+        private fun moduleMounted(): Boolean = MOUNT_PROBES.any { path ->
+            try {
+                Os.stat(path).st_dev != Os.stat(path.substringBeforeLast('/')).st_dev
+            } catch (_: Exception) {
+                false
+            }
         }
     }
 }
