@@ -1747,7 +1747,7 @@
   "Zoom.labelBitmap": {
    "kind": "field",
    "in": "com.oplus.camera.feature.zoom.view.ZoomSeekBar",
-   "name": "I6",
+   "name": "J6",
    "type": "android.graphics.Bitmap"
   },
   "Zoom.fadeLabels": {
@@ -2073,10 +2073,7 @@
   },
   "EffectItemView": {
    "kind": "class",
-   "strings": [
-    "MasterEffectContainer",
-    "expand"
-   ]
+   "name": "if.s0$c"
   },
   "EffectItemView.onClick": {
    "kind": "method",
@@ -2798,13 +2795,13 @@
   "Personalized.style": {
    "kind": "field",
    "in": "com.oplus.gallery.photoeditor.editingvvm.watermarkpersonalized.WatermarkPersonalizedEditSection",
-   "name": "g1",
+   "name": "i1",
    "type": "java.lang.String"
   },
   "Personalized.labels": {
    "kind": "field",
    "in": "com.oplus.gallery.photoeditor.editingvvm.watermarkpersonalized.WatermarkPersonalizedEditSection",
-   "name": "Y0",
+   "name": "X0",
    "type": "java.util.List"
   },
   "Extend.parse": {

@@ -65,6 +65,9 @@ public final class ModuleSettings {
     /** Master colour exposure alignment to the stock look (MasterAlign.*): added to the exposure compensation. */
     public static final String MASTER_ALIGN = "master_align";
 
+    /** AI composition (灵感构图): open the stock entry whose feature-table gate the device does not advertise. */
+    public static final String AI_COMPOSITION = "ai_composition";
+
     /** Normal video: keep normal filters at 4K30 / 4K60 / 1080p60 (stock falls back to 1080p30). */
     public static final String VIDEO_FILTER_HIGH_SPEC = "video_filter_high_spec";
 
@@ -183,6 +186,10 @@ public final class ModuleSettings {
             case XPAN_CLEAN_LARGE_MASK:
             case XPAN_CLEAN_ANIMATION:
             case HIGH_PIXEL_200M_NO_FACE:
+            // 灵感构图: the entry gate is already opened by a dedicated module (com.linggan.goutu) on
+            // devices that install one; stacking a second hook on the same method buys nothing, so the
+            // built-in gate stays opt-in.
+            case AI_COMPOSITION:
                 return false;
             case POP_HIGH_PIXEL:
             case UNLOCK_25MP:

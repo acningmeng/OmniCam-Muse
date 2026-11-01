@@ -253,6 +253,17 @@ private fun LazyListScope.shootItems(store: SettingsStore, cardModifier: Modifie
             )
         }
     }
+    item(key = "composition") {
+        SmallTitle(text = "构图")
+        Card(modifier = cardModifier) {
+            SettingSwitch(
+                store = store,
+                key = ModuleSettings.AI_COMPOSITION,
+                title = "灵感构图",
+                summary = "打开相机里的灵感构图入口。构图建议由系统的 aiunit 服务联网给出，需要登录账号",
+            )
+        }
+    }
     item(key = "video") {
         SmallTitle(text = "视频")
         Card(modifier = cardModifier) {

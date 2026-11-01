@@ -64,9 +64,32 @@ for TARGET in $(awk -v root="${MODDIR#/data}/" 'index($4, root) == 1 && index($5
     umount -l "$TARGET" >> "$LOG" 2>&1 || exit 1
 done
 
-for NAME in camera_unit_config camera_unit_feature_config.protobuf oplus_camera_config oplus_camera_algo_switch_config oplus_camera_aps_config oplus_camera_preview_decision_config.json; do
-    bind_file "$MODDIR/payload/$NAME" "/odm/etc/camera/config/$NAME"
-done
+# The payload configs were captured from the X9 Ultra: they name lighthouse* sensors and carry every
+# X9 Ultra mode. On a device with a different sensor set (Find X8 Ultra / SM8750) they may not parse,
+# so touch $MODDIR/disable_config_binds to keep the stock configuration and only run the LUT/hook
+# layers. The ISZ patch below reads the live file and skips itself when the layout differs.
+if [ -f "$MODDIR/disable_config_binds" ]; then
+    log "config binds disabled"
+else
+    # Rebased on this device's own files (see module/profiles/x8u/deltas.json): the payload is the
+    # live config plus the X9 Ultra-only entries, so binding it can only add modes.
+    for NAME in camera_unit_config oplus_camera_preview_decision_config.json; do
+        bind_file "$MODDIR/payload/$NAME" "/odm/etc/camera/config/$NAME"
+    done
+    # The feature table is what actually advertises gr_photo / retro_camera / tilt.shift and
+    # ai_composition to the camera; this device's own table has none of them, so the X9 Ultra table is
+    # bound as-is. It is also the mount probe UnmountedGuard reads (st_dev differs once bound).
+    bind_file "$MODDIR/payload/camera_unit_feature_config.protobuf" /odm/etc/camera/config/camera_unit_feature_config.protobuf
+    # These three are still X9 Ultra builds. On a device whose own file is newer they would be a
+    # downgrade (fewer vendor tags, lighthouse* sensor names), so they stay off unless asked for.
+    if [ -f "$MODDIR/enable_stale_config_binds" ]; then
+        for NAME in oplus_camera_config oplus_camera_algo_switch_config oplus_camera_aps_config; do
+            bind_file "$MODDIR/payload/$NAME" "/odm/etc/camera/config/$NAME"
+        done
+    else
+        log "stale x9 configs skipped (touch $MODDIR/enable_stale_config_binds to bind them)"
+    fi
+fi
 # Forced shutter sound stream at the system volume curve (see tools/patch_audio_volumes.py).
 bind_file "$MODDIR/payload/audio_policy_volumes.xml" /odm/etc/audio/audio_policy_volumes.xml
 
@@ -86,10 +109,17 @@ log "host_film=$(ls -l /odm/etc/camera/meishe_lut/fuji-nc.bin 2>&1)"
 log "retro_ini=$(ls -l /odm/etc/camera/basictone/setting_Retro/SimTool_Master.ini 2>&1)"
 log "host_setting=$(ls -d /odm/etc/camera/basictone/setting 2>&1)"
 
+# The X9 Ultra ships SM8850 (lighthouse) tuning files; other devices name them by their own SoC
+# codename (Find X8 Ultra / SM8750 uses com.qti.tuned.zf*.bin). Only replace a file the device
+# actually has, otherwise its own tuning stays in place.
 for LENS in main wide tele ultratele; do
     NAME="com.qti.tuned.lighthouse${LENS}.bin"
     SOURCE="$MODDIR/payload/isp/$NAME"
     TARGET="/odm/lib64/camera/$NAME"
+    if [ ! -f "$TARGET" ]; then
+        log "isp skip $NAME (device has no $TARGET)"
+        continue
+    fi
     chown root:root "$SOURCE"
     chmod 0644 "$SOURCE"
     chcon u:object_r:vendor_file:s0 "$SOURCE" 2>>"$LOG" || true

@@ -26,8 +26,10 @@ g(
  Section__root=F(**{"in": WCS}, name="q", type="androidx.constraintlayout.widget.ConstraintLayout"),
  Editing__context=F(**{"in": BES}, name="g", type="android.content.Context"),
  Personalized__setup=M(**{"in": WPS}, strings=["feature_is_support_hassel_device", "feature_is_support_video_watermark_extra_large_text_size"]),
- Personalized__style=F(**{"in": WPS}, name="g1", type=S),
- Personalized__labels=F(**{"in": WPS}, name="Y0", type="java.util.List"),
+ # X8U gallery: g1 is now the AppUiResponder; the style id written by setup is i1.
+Personalized__style=F(**{"in": WPS}, name="i1", type=S),
+ # X8U gallery: Y0 became a boolean; setup writes the label list into X0.
+Personalized__labels=F(**{"in": WPS}, name="X0", type="java.util.List"),
  Extend__parse=M(params=["java.util.Map", None, "int", "android.util.Size"], ret="kotlin.Pair", strings=["gr.effect.info"]),
  Brand__isRealme=M(params=[None, "android.content.Context"], ret="boolean", static=True, fields=["Lcom/oplus/gallery/foundation/util/R$string;->common_realme_brand_exp:I"]),
  # Watermark data of a photo and the photo-editor check that offers the hasselblad / LUMO / GR tabs.

@@ -7,6 +7,7 @@ import local.jiege.hook.common.CameraLogMirror;
 import local.jiege.hook.common.Log;
 import local.jiege.hook.common.Symbols;
 import local.jiege.hook.capture.CaptureDumps;
+import local.jiege.hook.composition.AiComposition;
 import local.jiege.hook.filterpanel.LegacyFilterPanel;
 import local.jiege.hook.filters.FilterGroupInjector;
 import local.jiege.hook.gr.GrPort;
@@ -66,6 +67,7 @@ import local.jiege.hook.x10.X10FilterPort;
  *   video         normal filters at 4K / 60fps in normal video
  *   launch        quick launch key opens a chosen mode
  *   natural       natural photo mode: AI detail enhancement and LCE off, extra softening (tuning json, tone transfer)
+ *   composition   AI composition (灵感构图): opens the stock entry the device's feature table does not advertise
  */
 public final class ModuleEntry implements IXposedHookLoadPackage, IXposedHookZygoteInit {
     private static final String CAMERA = "com.oplus.camera";
@@ -112,6 +114,7 @@ public final class ModuleEntry implements IXposedHookLoadPackage, IXposedHookZyg
             HighPixelEffects.installCamera(classLoader);
             TiltShiftCapture.installCamera(classLoader);
             SeamlessBlurGuard.installCamera(classLoader);
+            AiComposition.installCamera(classLoader);
             KeyLaunchMode.installCamera(classLoader);
             Log.guard("CameraLog", "camera log mirror", () -> CameraLogMirror.install(classLoader));
             MasterFilterCompletion.installCamera(classLoader);

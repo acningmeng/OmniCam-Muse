@@ -1,0 +1,85 @@
+{
+  "schemaVersion": 1,
+  "profileId": "pku110-17.0.0.104-camera-7.006.123",
+  "model": "PKU110",
+  "device": "OP5DD2L1",
+  "marketName": "OPPO Find X8 Ultra 卫星通信版",
+  "systemBuild": "PKU110_17.0.0.104(CN01)",
+  "androidVersion": 17,
+  "sdkInt": 37,
+  "colorOs": "V17.0.0",
+  "socCodename": "sun",
+  "socModel": "SM8750",
+  "abi": "arm64-v8a",
+  "packages": [
+    {
+      "role": "CAMERA",
+      "packageName": "com.oplus.camera",
+      "versionName": "7.006.123",
+      "versionCode": 60000,
+      "codePath": "/product/app/OplusCamera",
+      "apkSha256": "19668faeef936e6f8f8593310051292c3a37cfe1a4e1b598a2d471d31a7491b7",
+      "apkBytes": 176189839
+    },
+    {
+      "role": "GALLERY",
+      "packageName": "com.coloros.gallery3d",
+      "codePath": "pm path com.coloros.gallery3d -> base.apk",
+      "apkSha256": "a193f4375933e715723b38be690d4761ec2a4887e1b8cc449cae60a452c0e85a",
+      "apkBytes": 226969488
+    }
+  ],
+  "sdkJar": {
+    "system": {
+      "path": "/product/framework/com.oplus.camera.unit.sdk.jar",
+      "sha256": "3873cc99d2bd8af0f14d8e1c4d5c5fcd750686ae39ef6df99e391baf2041933f",
+      "bytes": 5319483,
+      "dexStrings": {
+        "CombineLut": 3,
+        "PaletteColorTable": 0,
+        "PaletteColor": 0,
+        "ColorTable": 0
+      }
+    },
+    "moduleOverlay": {
+      "path": "payload/ipu/com.oplus.camera.unit.sdk.jar",
+      "sha256": "86400b09f0a0e9ee7d00a6e2e6e2efcca3146fb2f6e4d7aef75eaea0a59fc69a",
+      "bytes": 5357287,
+      "dexStrings": {
+        "CombineLut": 8,
+        "PaletteColorTable": 2,
+        "PaletteColor": 4,
+        "ColorTable": 4
+      }
+    },
+    "note": "相册调色盘（CL-01/FL-09）依赖 PaletteColorTable，X8U 的系统 SDK jar 里没有这些类，只有模块 overlay 的 X9U 构建有；因此 ipu jar 覆盖是功能前提而不是可选优化，同时它也是X8U 上唯一仍在用 X9U 构建的 Java 侧组件。"
+  },
+  "sdkJars": [
+    {
+      "path": "/odm/framework/androidx.camera.extensions.impl.fake.jar",
+      "bytes": 2371022
+    },
+    {
+      "path": "/product/framework/com.oplus.camera.unit.sdk.adapter.jar",
+      "bytes": 2939239
+    },
+    {
+      "path": "/product/framework/com.oplus.camera.unit.sdk.jar",
+      "bytes": 5319483
+    },
+    {
+      "path": "/system_ext/framework/androidx.camera.extensions.impl.jar",
+      "bytes": 166882
+    },
+    {
+      "path": "/system_ext/framework/subsys-camera-plugin.jar",
+      "bytes": 17742
+    }
+  ],
+  "nativeUnitsEnabled": [],
+  "notes": [
+    "相机 7.006.123 是本档案唯一验证过的构建；升级相机后 apkSha256 变化即为 MISMATCH。",
+    "相册包名是 com.coloros.gallery3d（不是 com.oplus.gallery），WM/FL/CL 组的功能依赖它。",
+    "SM8750 的 ISP 调优文件按 zf* 命名，与 payload 里的 lighthouse* 不匹配，见 mounts.json。"
+  ]
+}

@@ -104,6 +104,11 @@ set_config com.oplus.feature.retro.camera.support 1
 # Flash brightness slider (柔和/反差); the camera drives it through com.oplus.flash.IntensityControl.
 set_config com.oplus.flashlevel.configurable.support 1
 set_config com.oplus.feature.tilt.shift.photo.support 1
+# AI composition: the switch state is the stock DataKey of AICompositionFeatureKeys. The feature-table
+# gate (isSupportAIComposition) is opened by the AiComposition hook; the entry guide is marked as seen so
+# the first open does not sit on the guide video.
+set_config key_ai_composition 1
+set_config ai_composition_entry_guide_shown_v2 1
 # Tilt-shift: mode_data.db is built once from the feature flags. If it has no tiltShift row yet, drop it once
 # (the marker keeps this to a single time) so the camera recreates it with the tilt-shift flag on.
 TILT_MARK="$MODDIR/tilt_db_reset"

@@ -1,0 +1,689 @@
+{
+  "schemaVersion": 1,
+  "profileId": "pku110-17.0.0.104-camera-7.006.123",
+  "bases": {
+    "payload/camera_unit_config": {
+      "file": "module/profiles/x8u/base/camera_unit_config",
+      "sha256": "24624f35ab3e5f6b5d775b9c7cfc93d74d4984209aecbfb4a4f98d3c68f0846b",
+      "bytes": 20261,
+      "devicePath": "/odm/etc/camera/config/camera_unit_config",
+      "deviceSha256": "24624f35ab3e5f6b5d775b9c7cfc93d74d4984209aecbfb4a4f98d3c68f0846b"
+    },
+    "payload/oplus_camera_preview_decision_config.json": {
+      "file": "module/profiles/x8u/base/oplus_camera_preview_decision_config.json",
+      "sha256": "7896d40f36a491739d7b696891af3d14a3e5341c1ce7644282decb5e7b6e7a6b",
+      "bytes": 360911,
+      "devicePath": "/odm/etc/camera/config/oplus_camera_preview_decision_config.json",
+      "deviceSha256": "a09195b938203ac6cea5282aa1aaea2caa5bd5e342a2274dd9d0e42d09a6f5e5"
+    }
+  },
+  "source": {
+    "keySource": "/odm/lib64/libOplusSecurity.so +0x7AB, 32 bytes ^0x3F, every other byte",
+    "codec": "aes-ecb envelope (01 01) or plain json",
+    "x9PayloadSha256": "62bbfd05345590aff707fbe0d1d633fbd75e6944d7a0336e0f1d11e80427b9d9"
+  },
+  "targets": [
+    {
+      "path": "payload/camera_unit_config",
+      "codec": "json",
+      "ops": [
+        {
+          "id": "feature_operation_mode.telephoto_video_mode",
+          "featureId": "MD-02",
+          "op": "insert",
+          "jsonPath": "feature_operation_mode.telephoto_video_mode",
+          "value": {
+            "stabilization": {
+              "super_stabilization": "80b7"
+            },
+            "fps": {
+              "video_60fps": "80b6"
+            },
+            "fovc": {
+              "on": "0300"
+            }
+          },
+          "expect": "absent"
+        },
+        {
+          "id": "mode_operation_mode.gr_mode",
+          "featureId": "MD-01",
+          "op": "insert",
+          "jsonPath": "mode_operation_mode.gr_mode",
+          "value": "8009",
+          "expect": "absent"
+        },
+        {
+          "id": "mode_operation_mode.telephoto_capture_mode",
+          "featureId": "MD-02",
+          "op": "insert",
+          "jsonPath": "mode_operation_mode.telephoto_capture_mode",
+          "value": "80b4",
+          "expect": "absent"
+        },
+        {
+          "id": "mode_operation_mode.telephoto_video_mode",
+          "featureId": "MD-02",
+          "op": "insert",
+          "jsonPath": "mode_operation_mode.telephoto_video_mode",
+          "value": "80b5",
+          "expect": "absent"
+        },
+        {
+          "id": "mode_operation_mode.retro_camera_mode",
+          "featureId": "MD-04",
+          "op": "insert",
+          "jsonPath": "mode_operation_mode.retro_camera_mode",
+          "value": "8001",
+          "expect": "absent"
+        },
+        {
+          "id": "usecase_info.sat_photo_none_yuv_case",
+          "featureId": "MD-01",
+          "op": "insert",
+          "jsonPath": "usecase_info.sat_photo_none_yuv_case",
+          "value": [
+            {
+              "capture_meta": "rear_sat"
+            },
+            {
+              "preview": "rear_sat"
+            },
+            {
+              "raw_output": "rear_main"
+            },
+            {
+              "raw_output": "rear_wide"
+            },
+            {
+              "raw_output": "rear_tele"
+            },
+            {
+              "raw_output": "rear_ultra_tele"
+            },
+            {
+              "preview_in_preview": "rear_sat"
+            },
+            {
+              "capture_raw10_dol": "rear_main"
+            },
+            {
+              "capture_raw10_dol": "rear_wide"
+            },
+            {
+              "capture_raw10_dol": "rear_tele"
+            },
+            {
+              "capture_raw10_dol": "rear_ultra_tele"
+            },
+            {
+              "capture_raw10_3dol": "rear_main"
+            },
+            {
+              "capture_raw10_fullsize": "rear_main"
+            },
+            {
+              "capture_raw10_fullsize": "rear_tele"
+            },
+            {
+              "raw10_high_output": "rear_ultra_tele"
+            },
+            {
+              "capture_raw16_cs": "rear_sat"
+            }
+          ],
+          "expect": "absent"
+        },
+        {
+          "id": "usecase_info.sat_photo_none_yuv_full_size_case",
+          "featureId": "MD-01",
+          "op": "insert",
+          "jsonPath": "usecase_info.sat_photo_none_yuv_full_size_case",
+          "value": [
+            {
+              "capture_meta": "rear_sat"
+            },
+            {
+              "preview": "rear_sat"
+            },
+            {
+              "raw_output": "rear_main"
+            },
+            {
+              "raw_output": "rear_wide"
+            },
+            {
+              "raw_output": "rear_tele"
+            },
+            {
+              "raw_output": "rear_ultra_tele"
+            },
+            {
+              "preview_in_preview": "rear_sat"
+            },
+            {
+              "capture_raw10_dol": "rear_main"
+            },
+            {
+              "capture_raw10_dol": "rear_wide"
+            },
+            {
+              "capture_raw10_dol": "rear_tele"
+            },
+            {
+              "capture_raw10_dol": "rear_ultra_tele"
+            },
+            {
+              "capture_raw10_3dol": "rear_main"
+            },
+            {
+              "capture_raw10_fullsize": "rear_main"
+            },
+            {
+              "capture_raw10_fullsize": "rear_wide"
+            },
+            {
+              "capture_raw10_fullsize": "rear_tele"
+            },
+            {
+              "capture_raw10_fullsize": "rear_ultra_tele"
+            },
+            {
+              "raw10_high_output": "rear_ultra_tele"
+            },
+            {
+              "capture_raw16_cs": "rear_sat"
+            }
+          ],
+          "expect": "absent"
+        },
+        {
+          "id": "usecase_info.portrait_bokeh_3dol_case",
+          "featureId": "MD-01",
+          "op": "insert",
+          "jsonPath": "usecase_info.portrait_bokeh_3dol_case",
+          "value": [
+            {
+              "capture_meta": "rear_main"
+            },
+            {
+              "preview": "rear_main"
+            },
+            {
+              "preview": "rear_wide"
+            },
+            {
+              "raw_output": "rear_main"
+            },
+            {
+              "raw_output": "rear_wide"
+            },
+            {
+              "capture_raw10_dol": "rear_main"
+            },
+            {
+              "capture_raw10_3dol": "rear_main"
+            },
+            {
+              "capture_raw16_cs": "rear_sat"
+            }
+          ],
+          "expect": "absent"
+        },
+        {
+          "id": "usecase_info.telephoto_capture_case",
+          "featureId": "MD-02",
+          "op": "insert",
+          "jsonPath": "usecase_info.telephoto_capture_case",
+          "value": [
+            {
+              "preview": "rear_tele"
+            },
+            {
+              "raw_output": "var_camera"
+            },
+            {
+              "capture_yuv": "var_camera"
+            },
+            {
+              "capture_raw10_dol": "var_camera"
+            },
+            {
+              "preview_in_preview": "var_camera"
+            },
+            {
+              "raw10_high_output": "var_camera"
+            }
+          ],
+          "expect": "absent"
+        },
+        {
+          "id": "usecase_info.telephoto_video_case",
+          "featureId": "MD-02",
+          "op": "insert",
+          "jsonPath": "usecase_info.telephoto_video_case",
+          "value": [
+            {
+              "preview": "var_camera"
+            },
+            {
+              "capture": "var_camera"
+            },
+            {
+              "video_recorder": "var_camera"
+            },
+            {
+              "preview_in_preview": "var_camera"
+            },
+            {
+              "preview_frame": "var_camera"
+            }
+          ],
+          "expect": "absent"
+        },
+        {
+          "id": "usecase_info.preset_video_frame_snapshot_hires_case",
+          "featureId": "MD-01",
+          "op": "insert",
+          "jsonPath": "usecase_info.preset_video_frame_snapshot_hires_case",
+          "value": [
+            {
+              "preview": "var_camera"
+            },
+            {
+              "preview_high_res": "var_camera"
+            }
+          ],
+          "expect": "absent"
+        },
+        {
+          "id": "usecase_info.video_frame_snapshot_hires_case",
+          "featureId": "MD-01",
+          "op": "insert",
+          "jsonPath": "usecase_info.video_frame_snapshot_hires_case",
+          "value": [
+            {
+              "preview": "var_camera"
+            },
+            {
+              "preview_high_res": "var_camera"
+            }
+          ],
+          "expect": "absent"
+        },
+        {
+          "id": "usecase_info.gr_mode_case",
+          "featureId": "MD-01",
+          "op": "insert",
+          "jsonPath": "usecase_info.gr_mode_case",
+          "value": [
+            {
+              "capture_meta": "var_camera"
+            },
+            {
+              "preview": "var_camera"
+            },
+            {
+              "raw_output": "rear_main"
+            },
+            {
+              "raw_output": "rear_wide"
+            },
+            {
+              "raw_output": "rear_tele"
+            },
+            {
+              "raw_output": "rear_ultra_tele"
+            },
+            {
+              "capture_raw10_dol": "rear_main"
+            },
+            {
+              "capture_raw10_dol": "rear_wide"
+            },
+            {
+              "capture_raw10_dol": "rear_tele"
+            },
+            {
+              "capture_raw10_dol": "rear_ultra_tele"
+            },
+            {
+              "capture_raw10_3dol": "rear_main"
+            },
+            {
+              "preview_in_preview": "rear_sat"
+            }
+          ],
+          "expect": "absent"
+        },
+        {
+          "id": "usecase_info.gr_mode_hq_raw_case",
+          "featureId": "MD-01",
+          "op": "insert",
+          "jsonPath": "usecase_info.gr_mode_hq_raw_case",
+          "value": [
+            {
+              "capture_meta": "var_camera"
+            },
+            {
+              "preview": "rear_sat"
+            },
+            {
+              "capture_raw10_fullsize": "rear_main"
+            },
+            {
+              "capture_raw10_fullsize": "rear_wide"
+            },
+            {
+              "capture_raw10_fullsize": "rear_tele"
+            },
+            {
+              "capture_raw10_fullsize": "rear_ultra_tele"
+            },
+            {
+              "raw_output": "rear_main"
+            },
+            {
+              "raw_output": "rear_wide"
+            },
+            {
+              "raw_output": "rear_tele"
+            },
+            {
+              "raw_output": "rear_ultra_tele"
+            },
+            {
+              "capture_raw10_dol": "rear_main"
+            },
+            {
+              "capture_raw10_dol": "rear_wide"
+            },
+            {
+              "capture_raw10_dol": "rear_tele"
+            },
+            {
+              "capture_raw10_dol": "rear_ultra_tele"
+            },
+            {
+              "capture_raw10_3dol": "rear_main"
+            },
+            {
+              "preview_in_preview": "rear_sat"
+            }
+          ],
+          "expect": "absent"
+        },
+        {
+          "id": "usecase_info.front_high_pixel_case",
+          "featureId": "MD-01",
+          "op": "insert",
+          "jsonPath": "usecase_info.front_high_pixel_case",
+          "value": [
+            {
+              "preview": "front_main"
+            },
+            {
+              "capture_raw10_fullsize": "front_main"
+            },
+            {
+              "raw_output": "front_main"
+            },
+            {
+              "capture_yuv": "front_main"
+            },
+            {
+              "capture_yuv_mfnr": "front_main"
+            },
+            {
+              "capture_raw10_dol": "front_main"
+            }
+          ],
+          "expect": "absent"
+        },
+        {
+          "id": "usecase_info.retro_camera_case",
+          "featureId": "MD-01",
+          "op": "insert",
+          "jsonPath": "usecase_info.retro_camera_case",
+          "value": [
+            {
+              "capture_meta": "rear_sat"
+            },
+            {
+              "preview": "rear_sat"
+            },
+            {
+              "raw_output": "rear_main"
+            },
+            {
+              "raw_output": "rear_wide"
+            },
+            {
+              "raw_output": "rear_tele"
+            },
+            {
+              "raw_output": "rear_ultra_tele"
+            },
+            {
+              "preview_in_preview": "rear_sat"
+            },
+            {
+              "capture_raw10_dol": "rear_main"
+            },
+            {
+              "capture_raw10_dol": "rear_wide"
+            },
+            {
+              "capture_raw10_dol": "rear_tele"
+            },
+            {
+              "capture_raw10_dol": "rear_ultra_tele"
+            },
+            {
+              "capture_raw10_3dol": "rear_main"
+            },
+            {
+              "capture_raw10_fullsize": "rear_main"
+            },
+            {
+              "capture_raw10_fullsize": "rear_wide"
+            },
+            {
+              "capture_raw10_fullsize": "rear_tele"
+            },
+            {
+              "capture_raw10_fullsize": "rear_ultra_tele"
+            },
+            {
+              "raw10_high_output": "rear_ultra_tele"
+            },
+            {
+              "capture_raw16_cs": "rear_sat"
+            }
+          ],
+          "expect": "absent"
+        },
+        {
+          "id": "parameter_feature_mapping.com.oplus.config.video.blur_video",
+          "featureId": "MD-01",
+          "op": "insert",
+          "jsonPath": "parameter_feature_mapping.com.oplus.config.video.blur_video",
+          "value": [
+            "blur_video",
+            "String",
+            "3"
+          ],
+          "expect": "absent"
+        },
+        {
+          "id": "capture_stream_number.tilt_shift_mode",
+          "featureId": "MD-09",
+          "op": "insert",
+          "jsonPath": "capture_stream_number.tilt_shift_mode",
+          "value": {
+            "rear_wide": {
+              "2dol": "2",
+              "3dol": "3"
+            },
+            "rear_main": {
+              "2dol": "2",
+              "3dol": "3"
+            },
+            "rear_tele": {
+              "2dol": "2",
+              "3dol": "3"
+            },
+            "rear_ultra_tele": {
+              "2dol": "2",
+              "3dol": "3"
+            },
+            "rear_sat": {
+              "2dol": "2",
+              "3dol": "3"
+            },
+            "front_main": {
+              "2dol": "2"
+            }
+          },
+          "expect": "absent"
+        },
+        {
+          "id": "capture_stream_number.telephoto_capture_mode",
+          "featureId": "MD-02",
+          "op": "insert",
+          "jsonPath": "capture_stream_number.telephoto_capture_mode",
+          "value": {
+            "rear_tele": {
+              "2dol": "2"
+            }
+          },
+          "expect": "absent"
+        },
+        {
+          "id": "capture_stream_number.gr_mode",
+          "featureId": "MD-01",
+          "op": "insert",
+          "jsonPath": "capture_stream_number.gr_mode",
+          "value": {
+            "rear_wide": {
+              "2dol": "2",
+              "3dol": "3"
+            },
+            "rear_main": {
+              "2dol": "2",
+              "3dol": "3"
+            },
+            "rear_tele": {
+              "2dol": "2",
+              "3dol": "3"
+            },
+            "rear_ultra_tele": {
+              "2dol": "2",
+              "3dol": "3"
+            },
+            "rear_sat": {
+              "2dol": "2",
+              "3dol": "3"
+            }
+          },
+          "expect": "absent"
+        },
+        {
+          "id": "capture_stream_number.high_pixel_mode",
+          "featureId": "QL-04",
+          "op": "insert",
+          "jsonPath": "capture_stream_number.high_pixel_mode",
+          "value": {
+            "rear_wide": {
+              "2dol": "2",
+              "3dol": "3"
+            },
+            "rear_main": {
+              "2dol": "2",
+              "3dol": "3"
+            },
+            "rear_tele": {
+              "2dol": "2",
+              "3dol": "3"
+            },
+            "rear_ultra_tele": {
+              "2dol": "2",
+              "3dol": "3"
+            },
+            "front_main": {
+              "2dol": "2"
+            }
+          },
+          "expect": "absent"
+        },
+        {
+          "id": "capture_stream_number.retro_camera_mode",
+          "featureId": "MD-04",
+          "op": "insert",
+          "jsonPath": "capture_stream_number.retro_camera_mode",
+          "value": {
+            "rear_wide": {
+              "2dol": "2",
+              "3dol": "3"
+            },
+            "rear_main": {
+              "2dol": "2",
+              "3dol": "3"
+            },
+            "rear_tele": {
+              "2dol": "2",
+              "3dol": "3"
+            },
+            "rear_ultra_tele": {
+              "2dol": "2",
+              "3dol": "3"
+            },
+            "rear_sat": {
+              "2dol": "2",
+              "3dol": "3"
+            },
+            "front_main": {
+              "2dol": "2"
+            }
+          },
+          "expect": "absent"
+        }
+      ]
+    },
+    {
+      "path": "payload/oplus_camera_preview_decision_config.json",
+      "codec": "json",
+      "ops": [
+        {
+          "id": "preview-decision.pop-basictone",
+          "featureId": "MD-04",
+          "op": "patch",
+          "patchId": "pop-basictone",
+          "implementedBy": "tools/patch_25mp.py:pop_basictone",
+          "expect": "marker-absent",
+          "marker": "retro_camera_mode",
+          "hits": 2
+        }
+      ]
+    }
+  ],
+  "untouched": [
+    {
+      "path": "payload/oplus_camera_config",
+      "reason": "本机 70,696 B / 721 tag，X9 Ultra 97,527 B / 585 tag，X9 版是旧构建"
+    },
+    {
+      "path": "payload/oplus_camera_aps_config",
+      "reason": "非合法 JSON（含控制字符），且 sensor 名 lighthouse vs zf 不一致"
+    },
+    {
+      "path": "payload/oplus_camera_algo_switch_config",
+      "reason": "非合法 JSON，本机构建更大（132,984 > 109,976）"
+    },
+    {
+      "path": "payload/camera_unit_feature_config.protobuf",
+      "reason": "protobuf，无 schema，但相机用它判定 GR / 复古 / 移轴 / 灵感构图有没有，本机表里一条都没有，所以整份原样挂上"
+    }
+  ],
+  "opCount": 22
+}

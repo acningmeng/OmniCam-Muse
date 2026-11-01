@@ -11,7 +11,9 @@ add(
 
 MSB = "com.oplus.camera.control.MainShutterButton"
 add(
- Zoom__labelBitmap=F(**{"in": ZSB}, name="I6", type="android.graphics.Bitmap"),
+ # X8U 7.006.123: ZoomSeekBar keeps two Bitmap caches - H6 (icon, also read by drawIcon) and
+ # J6 (label strip, drawn with drawBitmap). X9U 7.006.119 had a single I6.
+ Zoom__labelBitmap=F(**{"in": ZSB}, name="J6", type="android.graphics.Bitmap"),
  Zoom__fadeLabels=M(**{"in": ZSB}, name="b", params=[], ret="void"),
  ZoomBase__fadeLabels=M(**{"in": "@ZoomBase"}, overrideOf="@Zoom.fadeLabels"),
  ZoomUi__bar=F(**{"in": "@ZoomUi"}, readBy=["@ZoomUi.setUnit"]),
@@ -73,7 +75,10 @@ add(
  # less twice sideMargin. updateBounds recomputes the reset capsule and the item backdrop from the row's position
  EffectContainer__sideMargin=F(**{"in": "@EffectContainer"}, name="q", type="int"),
  EffectContainer__updateBounds=M(**{"in": "@EffectContainer"}, params=[], ret="void", strings=["updateBlurBgBounds, calLeftAndRight is null, return"]),
- EffectItemView=K(strings=["MasterEffectContainer", "expand"]),
+ # X8U 7.006.123: the master-effect menu still exists, but its item holder no longer logs
+ # "MasterEffectContainer"+"expand"; the family is if.b2 (Reno) / if.s2 (Vibe) / if.y (GR) /
+ # if.s0 (Master), each with a $a/$c item holder and a $d/$f value holder that adds a TextView.
+ EffectItemView=K(name="if.s0$c"),
  EffectItemView__onClick=M(**{"in": "@EffectItemView"}, name="onClick"),
  EffectItemView__item=F(**{"in": "@EffectItemView"}, type="@EffectItem"),
  EffectItemView__bind=M(**{"in": "@EffectItemView"}, params=["boolean", "boolean"], ret="void"),
