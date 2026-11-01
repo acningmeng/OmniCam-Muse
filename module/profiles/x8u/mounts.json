@@ -71,11 +71,11 @@
         "payload/oplus_camera_config"
       ],
       "target": "/odm/etc/camera/config/oplus_camera_config",
-      "gate": "enable_stale_config_binds,disable_config_binds",
-      "verdict": "blocked:stale-x9-build",
+      "gate": "disable_config_binds",
+      "verdict": "rebased",
       "selinux": "vendor_configs_file",
       "policy": "skip-if-missing",
-      "expected": "gated:marker-enable_stale_config_binds"
+      "expected": "ready"
     },
     {
       "id": "oplus_camera_algo_switch_config",
@@ -720,7 +720,7 @@
     ]
   },
   "expectedSummary": {
-    "ready": 10,
+    "ready": 11,
     "skipped": 4
   }
 }

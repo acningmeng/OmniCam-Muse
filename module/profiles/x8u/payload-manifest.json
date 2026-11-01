@@ -2433,8 +2433,8 @@
     },
     {
       "path": "payload/oplus_camera_config",
-      "bytes": 97527,
-      "sha256": "51c753e047e09e24a4dbd25094414be5bdd067bdb6f51a0663dbce32ef64ec1e"
+      "bytes": 90485,
+      "sha256": "9ae9c922013aa8cc00d783c96421830259199ddf1af1088ad956630ac8ebe3d5"
     },
     {
       "path": "payload/oplus_camera_preview_decision_config.json",

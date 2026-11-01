@@ -73,7 +73,7 @@ if [ -f "$MODDIR/disable_config_binds" ]; then
 else
     # Rebased on this device's own files (see module/profiles/x8u/deltas.json): the payload is the
     # live config plus the X9 Ultra-only entries, so binding it can only add modes.
-    for NAME in camera_unit_config oplus_camera_preview_decision_config.json; do
+    for NAME in camera_unit_config oplus_camera_preview_decision_config.json oplus_camera_config; do
         bind_file "$MODDIR/payload/$NAME" "/odm/etc/camera/config/$NAME"
     done
     # APS keeps the list of modes it will produce preview results for, keyed "<mode>@<cameraId>".
@@ -89,7 +89,7 @@ else
     # These three are still X9 Ultra builds. On a device whose own file is newer they would be a
     # downgrade (fewer vendor tags, lighthouse* sensor names), so they stay off unless asked for.
     if [ -f "$MODDIR/enable_stale_config_binds" ]; then
-        for NAME in oplus_camera_config oplus_camera_aps_config; do
+        for NAME in oplus_camera_aps_config; do
             bind_file "$MODDIR/payload/$NAME" "/odm/etc/camera/config/$NAME"
         done
     else
