@@ -28,6 +28,15 @@ X8U 上的实际绑定量（`mounts.json` 的 `expectedSummary`）：可以挂�
 绑定等于把别的镜头调优套上来）。另外两个配置（`oplus_camera_config`、`oplus_camera_aps_config`）仍是 X9 Ultra 构建，
 比本机原厂旧，默认不 bind；需要时 `touch $MODDIR/enable_stale_config_binds` 才挂。
 
+## 挂载的释放与机型闸门
+
+两个脚本管住了"换配置"之外最容易踩的坑：
+
+- `mount-state.sh`：每次 bind 成功后把 `(源, 目标)` 记进 `mounted-targets`，下次开机只释放这些配对，并且要求目标处仍是我们的顶层 bind。按路径前缀倒序 umount 会把别人的挂载一起拆掉——`basictone` / `meishe_lut` 一旦被拆，POP 的胶片取色调表就没了，取景会直接卡死。
+- `device.sh`：按 `ro.product.model` 定 profile（`PKU110` / `PKJ110` → x8u，`PMA110` → x9u，其余 unknown）。unknown 时不绑配置、只跑 LUT 与 hook 层；命中的 profile 会把固件与相机版本写进 `bind.log`，与验证过的版本不一致时单独记一行。开关 `disable_config_binds` 仍然有效。
+
+配置绑定只在开机时做。运行期对 `/odm/etc/camera/config` 下任何文件重新 `mount --bind`，相机 provider 会继续持有旧 inode，表现为取景黑屏、快门全废——包括把原厂同一份文件绑回原处。改配置请写进模块目录后重启（`ksud soft-reboot` 足够）。
+
 ## POP / 理光的快门为什么需要那张 APS 模式表
 
 快门点了没反应，问题不在触摸也不在 LUT。`/odm/etc/camera/config/oplus_camera_algo_switch_config` 是 APS 记录
