@@ -30,12 +30,13 @@ PROFILE_ID = "pku110-17.0.0.104-camera-7.006.123"
 # name -> (marker gate, verdict). The two rebased files are the live device config plus X9-only
 # entries; the rest are still X9 Ultra builds and default to off (see post-fs-data.sh).
 CONFIGS = [
-    ("camera_unit_config", None, "rebased"),
-    ("oplus_camera_preview_decision_config.json", None, "rebased"),
-    ("camera_unit_feature_config.protobuf", None, "feature-table"),
-    ("oplus_camera_config", None, "rebased"),
-    ("oplus_camera_algo_switch_config", None, "generated:algo-switch"),
-    ("oplus_camera_aps_config", "enable_stale_config_binds", "blocked:stale-x9-build"),
+    # Layer markers match module/post-fs-data.sh; nothing is bound unless the marker exists.
+    ("camera_unit_config", "enable_config_binds", "rebased:device-plus-x9-entries"),
+    ("camera_unit_feature_config.protobuf", "enable_config_binds", "feature-table"),
+    ("oplus_camera_algo_switch_config", "enable_algo_switch", "generated:algo-switch"),
+    ("oplus_camera_config", "enable_occ_extras", "rebased:occ-extras"),
+    ("oplus_camera_preview_decision_config.json", "enable_legacy_configs", "legacy:x9-build"),
+    ("oplus_camera_aps_config", "enable_legacy_configs", "legacy:x9-build"),
 ]
 GAMMA_NAMES = ["gamma_preview_sdr_conf.json", "gamma_quick_sdr_conf.json", "gamma_preview_hdr_conf.json"]
 ISP_LENSES = ["main", "wide", "tele", "ultratele"]
