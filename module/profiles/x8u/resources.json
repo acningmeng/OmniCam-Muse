@@ -1,0 +1,84 @@
+{
+  "schemaVersion": 1,
+  "profileId": "pku110-17.0.0.104-camera-7.006.123",
+  "groups": [
+    {
+      "id": "meishe-lut",
+      "path": "payload/meishe_lut",
+      "featureIds": [
+        "FL-01",
+        "FL-09",
+        "CL-01"
+      ],
+      "files": 42,
+      "bytes": 5284747,
+      "aggregateSha256": "bd8e3fae83e54de59165605e471abcd11f877358e6dfa50629488c5a0e284d37",
+      "licenseId": "device-capture"
+    },
+    {
+      "id": "basictone-x10",
+      "path": "payload/x10_basictone",
+      "featureIds": [
+        "MD-04",
+        "MC-02"
+      ],
+      "files": 35,
+      "bytes": 41781160,
+      "aggregateSha256": "b0f5314d0c5e3dae3f3e53c46ac2fd21de8f74311ad0f6ebd177cbc18dafac3b",
+      "licenseId": "device-capture"
+    },
+    {
+      "id": "basictone-retro",
+      "path": "payload/setting_Retro",
+      "featureIds": [
+        "MD-04"
+      ],
+      "files": 2,
+      "bytes": 1249,
+      "aggregateSha256": "2c9017fde2160546d7ede30d552c05d8cd252f2e19e2ed198c062b4c30011a0d",
+      "licenseId": "device-capture"
+    },
+    {
+      "id": "gamma",
+      "path": "payload/gamma",
+      "featureIds": [
+        "MD-02"
+      ],
+      "files": 3,
+      "bytes": 356914,
+      "aggregateSha256": "d14101476c71eeaad2fa76340b2ba10d23fe6c8773787064d68fc4d38f2b8d3e",
+      "licenseId": "device-capture"
+    },
+    {
+      "id": "isp",
+      "path": "payload/isp",
+      "featureIds": [
+        "MD-02",
+        "MD-03"
+      ],
+      "files": 4,
+      "bytes": 55134581,
+      "aggregateSha256": "15d16f642c2dff20db1284679392669b23252babb255826654d45222af374a3a",
+      "licenseId": "device-capture"
+    }
+  ],
+  "assets": [
+    {
+      "id": "gr-sounds",
+      "path": "assets/gr_sounds",
+      "files": 3,
+      "featureIds": [
+        "MD-03"
+      ],
+      "source": "realme RMX5200 16.0.10.501 com.oplus.camera 6.070.215"
+    },
+    {
+      "id": "symbols",
+      "path": "assets/symbols.json",
+      "sha256": "806f15f82c33a38a8f254bcb4f9a06ffc1c7b23387b2144e49e8e9ebc6d8b546",
+      "featureIds": []
+    }
+  ],
+  "inventory": "resources.files.txt",
+  "inventorySha256": "15d16f642c2dff20db1284679392669b23252babb255826654d45222af374a3a"
+}

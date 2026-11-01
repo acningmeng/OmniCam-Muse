@@ -31,7 +31,7 @@ profile() {
     esac
     say "device: model=$MODEL profile=$P firmware=$FW $CAM"
     [ "$P" = "unknown" ] && bad "unknown model, config layers must stay off"
-    for m in enable_config_binds enable_algo_switch enable_occ_extras enable_legacy_configs; do
+    for m in enable_config_binds enable_algo_switch enable_occ_extras enable_legacy_configs enable_composition; do
         [ -f "$MODDIR/$m" ] && say "  marker: $m"
     done
     return 0

@@ -38,6 +38,20 @@
 `x8u_selftest.sh` 只读：`gate`（机型/固件/相机版本/标记）、`hooks`（LSPosed 是否注入相机与相册）、
 `mounts`（哪几份配置在绑、合并目录是否完整）、`shoot`（按一次快门前后比对媒体库）、`all`。
 
+## 灵感构图（本机启发式，x8u-rebuild 分支）
+
+OPPO 相机的构图面板等的是一个 `com.oplus.aiunit.core.base.FrameDetector`，而这台机器的 aiunit
+能力包里根本没有构图单元（`Detector/` 27 个、`OAA/` 里也没有 composition 模型），所以入口开了也一直
+「无构图场景」。本分支不再依赖云端，改成在手机上自己算：
+
+- `CompositionHeuristic`：Sobel 边缘能量质心 → 与三分法交点比较 → 输出 0–100 分、一句提示、一个归一化取景框。
+  纯整数运算，`tools/offline_tests/CompositionHeuristicTest.java` 覆盖空帧/纯色/左三分/右边缘/居中 5 组。
+- `CompositionBridge`：钩 `com.oplus.ocs.camera.OplusAICompositionHelper` 与
+  `com.oplus.camera.aicomposition.OplusAIComposition` 里参数带 Bitmap/Frame 的方法，偷预览帧、500 ms 节流、
+  按字段名把分数与提示写回结果对象。找不到类或字段就只记一行日志，原厂路径不动（fail-open）。
+- 开关：`enable_composition` 标记文件（在模块目录里 `touch enable_composition` 后重启相机生效）。
+  设置项 `ai_composition` 默认 false —— 手机上装了第三方云方案时让它先跑，两者不要同时开。
+
 系统侧的三个「别做」：
 - 不要 `killall lspd`（会把 zygote 拖死）；要停 hook 只在 LSPosed 管理器里改作用域。
 - 不要用 `adb reboot` 代替 `ksud soft-reboot`（会丢临时 root）。

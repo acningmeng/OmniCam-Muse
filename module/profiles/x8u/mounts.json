@@ -1,0 +1,696 @@
+{
+  "schemaVersion": 1,
+  "profileId": "pku110-17.0.0.104-camera-7.006.123",
+  "source": {
+    "dump": "/Users/howe/Downloads/OmniCam-Handoff-FULL-20261101/x8u-dump/20261101-183522",
+    "odmFiles": 4111
+  },
+  "entries": [
+    {
+      "id": "camera_unit_config",
+      "featureIds": [
+        "MD-01",
+        "MD-04",
+        "MD-07",
+        "QL-04"
+      ],
+      "kind": "bind-file",
+      "sources": [
+        "payload/camera_unit_config"
+      ],
+      "target": "/odm/etc/camera/config/camera_unit_config",
+      "gate": "enable_stale_config_binds,disable_config_binds",
+      "verdict": "rebased:device-plus-x9-entries",
+      "selinux": "vendor_configs_file",
+      "policy": "skip-if-missing",
+      "expected": "gated:marker-enable_config_binds"
+    },
+    {
+      "id": "camera_unit_feature_config.protobuf",
+      "featureIds": [
+        "MD-04",
+        "MD-06"
+      ],
+      "kind": "bind-file",
+      "sources": [
+        "payload/camera_unit_feature_config.protobuf"
+      ],
+      "target": "/odm/etc/camera/config/camera_unit_feature_config.protobuf",
+      "gate": "enable_stale_config_binds,disable_config_binds",
+      "verdict": "feature-table",
+      "selinux": "vendor_configs_file",
+      "policy": "skip-if-missing",
+      "expected": "gated:marker-enable_config_binds"
+    },
+    {
+      "id": "oplus_camera_algo_switch_config",
+      "featureIds": [
+        "CL-02",
+        "MC-01",
+        "MD-04"
+      ],
+      "kind": "bind-file",
+      "sources": [
+        "payload/oplus_camera_algo_switch_config"
+      ],
+      "target": "/odm/etc/camera/config/oplus_camera_algo_switch_config",
+      "gate": "enable_stale_config_binds,disable_config_binds",
+      "verdict": "generated:algo-switch",
+      "selinux": "vendor_configs_file",
+      "policy": "skip-if-missing",
+      "expected": "gated:marker-enable_algo_switch"
+    },
+    {
+      "id": "oplus_camera_config",
+      "featureIds": [
+        "UI-01",
+        "UI-05",
+        "MD-02"
+      ],
+      "kind": "bind-file",
+      "sources": [
+        "payload/oplus_camera_config"
+      ],
+      "target": "/odm/etc/camera/config/oplus_camera_config",
+      "gate": "enable_stale_config_binds,disable_config_binds",
+      "verdict": "rebased:occ-extras",
+      "selinux": "vendor_configs_file",
+      "policy": "skip-if-missing",
+      "expected": "gated:marker-enable_occ_extras"
+    },
+    {
+      "id": "oplus_camera_preview_decision_config.json",
+      "featureIds": [
+        "MD-04",
+        "CL-02"
+      ],
+      "kind": "bind-file",
+      "sources": [
+        "payload/oplus_camera_preview_decision_config.json"
+      ],
+      "target": "/odm/etc/camera/config/oplus_camera_preview_decision_config.json",
+      "gate": "enable_stale_config_binds,disable_config_binds",
+      "verdict": "legacy:x9-build",
+      "selinux": "vendor_configs_file",
+      "policy": "skip-if-missing",
+      "expected": "gated:marker-enable_legacy_configs"
+    },
+    {
+      "id": "oplus_camera_aps_config",
+      "featureIds": [
+        "MD-04",
+        "QL-05"
+      ],
+      "kind": "bind-file",
+      "sources": [
+        "payload/oplus_camera_aps_config"
+      ],
+      "target": "/odm/etc/camera/config/oplus_camera_aps_config",
+      "gate": "enable_stale_config_binds,disable_config_binds",
+      "verdict": "legacy:x9-build",
+      "selinux": "vendor_configs_file",
+      "policy": "skip-if-missing",
+      "expected": "gated:marker-enable_legacy_configs"
+    },
+    {
+      "id": "audio-volumes",
+      "featureIds": [
+        "UI-07"
+      ],
+      "kind": "bind-file",
+      "sources": [
+        "payload/audio_policy_volumes.xml"
+      ],
+      "target": "/odm/etc/audio/audio_policy_volumes.xml",
+      "gate": null,
+      "selinux": "vendor_configs_file",
+      "policy": "skip-if-missing",
+      "expected": "ready"
+    },
+    {
+      "id": "meishe-lut",
+      "featureIds": [
+        "FL-01",
+        "FL-09",
+        "CL-01"
+      ],
+      "kind": "bind-dir-merge",
+      "sources": [
+        "payload/meishe_lut"
+      ],
+      "live": "/odm/etc/camera/meishe_lut",
+      "target": "/odm/etc/camera/meishe_lut",
+      "gate": null,
+      "selinux": "vendor_configs_file",
+      "policy": "skip-if-live-missing",
+      "expected": "ready"
+    },
+    {
+      "id": "basictone",
+      "featureIds": [
+        "MD-04",
+        "MC-02"
+      ],
+      "kind": "bind-dir-merge",
+      "sources": [
+        "payload/x10_basictone",
+        "payload/setting_Retro->setting_Retro/"
+      ],
+      "live": "/odm/etc/camera/basictone",
+      "target": "/odm/etc/camera/basictone",
+      "gate": null,
+      "selinux": "vendor_configs_file",
+      "policy": "skip-if-live-missing",
+      "expected": "ready"
+    },
+    {
+      "id": "gamma_preview_sdr_conf.json",
+      "featureIds": [
+        "MD-02"
+      ],
+      "kind": "bind-file",
+      "sources": [
+        "payload/gamma/gamma_preview_sdr_conf.json"
+      ],
+      "target": "/odm/etc/camera/gamma_preview_sdr_conf.json",
+      "gate": null,
+      "selinux": "vendor_configs_file",
+      "policy": "skip-if-missing",
+      "expected": "ready"
+    },
+    {
+      "id": "gamma_quick_sdr_conf.json",
+      "featureIds": [
+        "MD-02"
+      ],
+      "kind": "bind-file",
+      "sources": [
+        "payload/gamma/gamma_quick_sdr_conf.json"
+      ],
+      "target": "/odm/etc/camera/gamma_quick_sdr_conf.json",
+      "gate": null,
+      "selinux": "vendor_configs_file",
+      "policy": "skip-if-missing",
+      "expected": "ready"
+    },
+    {
+      "id": "gamma_preview_hdr_conf.json",
+      "featureIds": [
+        "MD-02"
+      ],
+      "kind": "bind-file",
+      "sources": [
+        "payload/gamma/gamma_preview_hdr_conf.json"
+      ],
+      "target": "/odm/etc/camera/gamma_preview_hdr_conf.json",
+      "gate": null,
+      "selinux": "vendor_configs_file",
+      "policy": "skip-if-missing",
+      "expected": "ready"
+    },
+    {
+      "id": "isp-main",
+      "featureIds": [
+        "MD-02",
+        "MD-03",
+        "MC-01"
+      ],
+      "kind": "bind-file",
+      "sources": [
+        "payload/isp/com.qti.tuned.lighthousemain.bin"
+      ],
+      "target": "/odm/lib64/camera/com.qti.tuned.lighthousemain.bin",
+      "gate": null,
+      "selinux": "vendor_file",
+      "policy": "skip-if-missing",
+      "expected": "skipped:target-missing"
+    },
+    {
+      "id": "isp-wide",
+      "featureIds": [
+        "MD-02",
+        "MD-03",
+        "MC-01"
+      ],
+      "kind": "bind-file",
+      "sources": [
+        "payload/isp/com.qti.tuned.lighthousewide.bin"
+      ],
+      "target": "/odm/lib64/camera/com.qti.tuned.lighthousewide.bin",
+      "gate": null,
+      "selinux": "vendor_file",
+      "policy": "skip-if-missing",
+      "expected": "skipped:target-missing"
+    },
+    {
+      "id": "isp-tele",
+      "featureIds": [
+        "MD-02",
+        "MD-03",
+        "MC-01"
+      ],
+      "kind": "bind-file",
+      "sources": [
+        "payload/isp/com.qti.tuned.lighthousetele.bin"
+      ],
+      "target": "/odm/lib64/camera/com.qti.tuned.lighthousetele.bin",
+      "gate": null,
+      "selinux": "vendor_file",
+      "policy": "skip-if-missing",
+      "expected": "skipped:target-missing"
+    },
+    {
+      "id": "isp-ultratele",
+      "featureIds": [
+        "MD-02",
+        "MD-03",
+        "MC-01"
+      ],
+      "kind": "bind-file",
+      "sources": [
+        "payload/isp/com.qti.tuned.lighthouseultratele.bin"
+      ],
+      "target": "/odm/lib64/camera/com.qti.tuned.lighthouseultratele.bin",
+      "gate": null,
+      "selinux": "vendor_file",
+      "policy": "skip-if-missing",
+      "expected": "skipped:target-missing"
+    }
+  ],
+  "runtimeStaging": [
+    {
+      "id": "gr-lmt",
+      "featureIds": [
+        "MD-01",
+        "MD-03"
+      ],
+      "kind": "copy-selected",
+      "sources": [
+        "payload/gr_adjustment_lmt"
+      ],
+      "destination": "com.oplus.camera files/ricoh_gr/lmt",
+      "consumer": "service.sh:48-68",
+      "owner": "CAMERA",
+      "dependsOnDevice": "live /odm/etc/camera/basictone/lmt 的文件名",
+      "checks": [
+        {
+          "path": "/odm/etc/camera/basictone/lmt/CWCM16Lut0",
+          "present": true
+        },
+        {
+          "path": "/odm/etc/camera/basictone/lmt/CWCM16Lut1",
+          "present": true
+        },
+        {
+          "path": "/odm/etc/camera/basictone/lmt/CWCM16Lut2",
+          "present": true
+        },
+        {
+          "path": "/odm/etc/camera/basictone/lmt/CWCM16Lut3",
+          "present": true
+        },
+        {
+          "path": "/odm/etc/camera/basictone/lmt/CWCM16Lut4",
+          "present": true
+        },
+        {
+          "path": "/odm/etc/camera/basictone/lmt/CWCM16Lut5",
+          "present": true
+        },
+        {
+          "path": "/odm/etc/camera/basictone/lmt/CWCM16Lut6",
+          "present": true
+        },
+        {
+          "path": "/odm/etc/camera/basictone/lmt/CWCM16Lut7",
+          "present": true
+        },
+        {
+          "path": "/odm/etc/camera/basictone/lmt/CWCM16Lut8",
+          "present": true
+        },
+        {
+          "path": "/odm/etc/camera/basictone/lmt/CWCM32Lut0",
+          "present": true
+        },
+        {
+          "path": "/odm/etc/camera/basictone/lmt/CWCM32Lut1",
+          "present": true
+        },
+        {
+          "path": "/odm/etc/camera/basictone/lmt/CWCM32Lut2",
+          "present": true
+        },
+        {
+          "path": "/odm/etc/camera/basictone/lmt/CWCM32Lut3",
+          "present": true
+        },
+        {
+          "path": "/odm/etc/camera/basictone/lmt/CWCM32Lut4",
+          "present": true
+        },
+        {
+          "path": "/odm/etc/camera/basictone/lmt/CWCM32Lut5",
+          "present": true
+        },
+        {
+          "path": "/odm/etc/camera/basictone/lmt/CWCM32Lut6",
+          "present": true
+        },
+        {
+          "path": "/odm/etc/camera/basictone/lmt/CWCM32Lut7",
+          "present": true
+        },
+        {
+          "path": "/odm/etc/camera/basictone/lmt/CWCM32Lut8",
+          "present": true
+        },
+        {
+          "path": "/odm/etc/camera/basictone/lmt/SC16Lut0",
+          "present": true
+        },
+        {
+          "path": "/odm/etc/camera/basictone/lmt/SC16Lut1",
+          "present": true
+        },
+        {
+          "path": "/odm/etc/camera/basictone/lmt/SC16Lut2",
+          "present": true
+        },
+        {
+          "path": "/odm/etc/camera/basictone/lmt/SC16Lut3",
+          "present": true
+        },
+        {
+          "path": "/odm/etc/camera/basictone/lmt/SC16Lut4",
+          "present": true
+        },
+        {
+          "path": "/odm/etc/camera/basictone/lmt/SC16Lut5",
+          "present": true
+        },
+        {
+          "path": "/odm/etc/camera/basictone/lmt/SC16Lut6",
+          "present": true
+        },
+        {
+          "path": "/odm/etc/camera/basictone/lmt/SC16Lut7",
+          "present": true
+        },
+        {
+          "path": "/odm/etc/camera/basictone/lmt/SC16Lut8",
+          "present": true
+        },
+        {
+          "path": "/odm/etc/camera/basictone/lmt/SC32Lut0",
+          "present": true
+        },
+        {
+          "path": "/odm/etc/camera/basictone/lmt/SC32Lut1",
+          "present": true
+        },
+        {
+          "path": "/odm/etc/camera/basictone/lmt/SC32Lut2",
+          "present": true
+        },
+        {
+          "path": "/odm/etc/camera/basictone/lmt/SC32Lut3",
+          "present": true
+        },
+        {
+          "path": "/odm/etc/camera/basictone/lmt/SC32Lut4",
+          "present": true
+        },
+        {
+          "path": "/odm/etc/camera/basictone/lmt/SC32Lut5",
+          "present": true
+        },
+        {
+          "path": "/odm/etc/camera/basictone/lmt/SC32Lut6",
+          "present": true
+        },
+        {
+          "path": "/odm/etc/camera/basictone/lmt/SC32Lut7",
+          "present": true
+        },
+        {
+          "path": "/odm/etc/camera/basictone/lmt/SC32Lut8",
+          "present": true
+        }
+      ],
+      "verdict": "ok"
+    },
+    {
+      "id": "master-color",
+      "featureIds": [
+        "MC-01",
+        "MC-02",
+        "MC-07"
+      ],
+      "kind": "copy-tree",
+      "sources": [
+        "payload/master_color"
+      ],
+      "destination": "com.oplus.camera files/jiege/mastercolor",
+      "consumer": "service.sh:75-99",
+      "owner": "CAMERA",
+      "dependsOnDevice": null
+    },
+    {
+      "id": "pop-port",
+      "featureIds": [
+        "MD-04"
+      ],
+      "kind": "copy-tree",
+      "sources": [
+        "payload/setting_Retro",
+        "payload/meishe_lut",
+        "payload/pld_watermark",
+        "payload/apk_resources"
+      ],
+      "destination": "com.oplus.camera files/pop_port + files/odm/etc/camera/pld_watermark",
+      "consumer": "service.sh:119-128",
+      "owner": "CAMERA",
+      "dependsOnDevice": null
+    },
+    {
+      "id": "unlock-25mp",
+      "featureIds": [
+        "QL-04"
+      ],
+      "kind": "copy-tree",
+      "sources": [
+        "payload/unlock25mp"
+      ],
+      "destination": "com.oplus.camera files/jiege/unlock25mp",
+      "consumer": "service.sh:132-139 + native unlock25mp.cpp 重定向",
+      "owner": "CAMERA",
+      "dependsOnDevice": "文件按 lighthouse{main,tele,ultratele,wide} 命名，X8U 的传感器是 zf*",
+      "verdict": "needs-regeneration"
+    },
+    {
+      "id": "face-200mp",
+      "featureIds": [
+        "QL-05"
+      ],
+      "kind": "copy-tree",
+      "sources": [
+        "payload/face200m"
+      ],
+      "destination": "com.oplus.camera files/jiege/face200m",
+      "consumer": "service.sh:143-149 + native face200m.cpp 重定向",
+      "owner": "CAMERA",
+      "dependsOnDevice": null
+    },
+    {
+      "id": "watermark-styles",
+      "featureIds": [
+        "WM-01",
+        "WM-03"
+      ],
+      "kind": "copy-selected",
+      "sources": [
+        "payload/watermark_master_styles",
+        "payload/watermark_drawables"
+      ],
+      "destination": "com.coloros.gallery3d files/ricoh_gr_styles + camera files/mode_limit_watermark",
+      "consumer": "service.sh:172-195",
+      "owner": "GALLERY",
+      "dependsOnDevice": null
+    },
+    {
+      "id": "ipu-jar",
+      "featureIds": [
+        "CL-01",
+        "FL-09"
+      ],
+      "kind": "replace-jar",
+      "sources": [
+        "payload/ipu/com.oplus.camera.unit.sdk.jar"
+      ],
+      "destination": "com.coloros.gallery3d files/jiege_ipu",
+      "consumer": "service.sh:199-210",
+      "owner": "GALLERY",
+      "dependsOnDevice": "X8U 系统 jar 无 PaletteColorTable，overlay 必须保留",
+      "verdict": "required"
+    }
+  ],
+  "settings": [
+    {
+      "key": "com.oplus.gr.mode.support",
+      "value": "1",
+      "consumer": "com.oplus.camera shared_prefs"
+    },
+    {
+      "key": "com.oplus.camera.mode.data.db.version",
+      "value": "102",
+      "consumer": "com.oplus.camera shared_prefs"
+    },
+    {
+      "key": "com.oplus.available.gr.mode.zoomvalues",
+      "value": "\"$GR_AVAILABLE\"",
+      "consumer": "com.oplus.camera shared_prefs"
+    },
+    {
+      "key": "com.oplus.gr.mode.marked.zoomvalues",
+      "value": "\"$GR_MARKED\"",
+      "consumer": "com.oplus.camera shared_prefs"
+    },
+    {
+      "key": "com.oplus.camera.capture.hdr.cap.mode.value",
+      "value": "'common,portrait,professional,night,highPixel,xpan,underWater,telephoto,gr,retroCamera'",
+      "consumer": "com.oplus.camera shared_prefs"
+    },
+    {
+      "key": "com.oplus.camera.preview.hdr.cap.mode.value",
+      "value": "'common,professional,night,highPixel,xpan,underWater,telephoto,gr'",
+      "consumer": "com.oplus.camera shared_prefs"
+    },
+    {
+      "key": "com.oplus.feature.retro.camera.support",
+      "value": "1",
+      "consumer": "com.oplus.camera shared_prefs"
+    },
+    {
+      "key": "com.oplus.flashlevel.configurable.support",
+      "value": "1",
+      "consumer": "com.oplus.camera shared_prefs"
+    },
+    {
+      "key": "com.oplus.feature.tilt.shift.photo.support",
+      "value": "1",
+      "consumer": "com.oplus.camera shared_prefs"
+    }
+  ],
+  "libraries": [
+    {
+      "id": "basictone-x9",
+      "featureIds": [
+        "CL-02",
+        "MD-04"
+      ],
+      "library": "libBasicTonePhotoX9.so",
+      "source": "system/odm/lib64/libBasicTonePhotoX9.so",
+      "target": "/odm/lib64/libBasicTonePhotoX9.so",
+      "condition": "target-exists:/odm/lib64/libBasicTonePhotoX9.so",
+      "note": "X9 Ultra only; X8 Ultra ships neither X9 nor X10",
+      "expected": "skipped:target-missing"
+    },
+    {
+      "id": "basictone-x10",
+      "featureIds": [
+        "CL-02",
+        "MD-04"
+      ],
+      "library": "libBasicTonePhotoX10.so",
+      "source": "system/odm/lib64/libBasicTonePhotoX10.so",
+      "target": "/odm/lib64/libBasicTonePhotoX10.so",
+      "condition": "target-exists:/odm/lib64/libBasicTonePhotoX10.so",
+      "note": "X9 Ultra only",
+      "expected": "skipped:target-missing"
+    },
+    {
+      "id": "basictone-router",
+      "featureIds": [
+        "CL-02",
+        "MD-04"
+      ],
+      "library": "libBasicTonePhoto.so",
+      "source": "system/odm/lib64/libBasicTonePhoto.so",
+      "target": "/odm/lib64/libBasicTonePhoto.so",
+      "condition": "after:basictone-x9",
+      "note": "8,960 B router that dlopens X9/X10; replacing the 538,400 B stock build without them breaks POP",
+      "expected": "gated:after-basictone-x9"
+    },
+    {
+      "id": "algo-interface",
+      "featureIds": [
+        "MC-07"
+      ],
+      "library": "libAlgoInterface.so",
+      "source": "system/odm/lib64/libAlgoInterface.so",
+      "target": "/odm/lib64/libAlgoInterface.so",
+      "condition": "marker:enable_algo_interface",
+      "note": "grain trampolines are hand-placed for the X9 Ultra build",
+      "expected": "gated:marker-enable_algo_interface"
+    },
+    {
+      "id": "native-filter",
+      "featureIds": [],
+      "library": "libmsnativefilter.so",
+      "source": "system/odm/lib64/libmsnativefilter.so",
+      "target": "/odm/lib64/libmsnativefilter.so",
+      "condition": "never",
+      "note": "no X8 Ultra verification; not bound",
+      "expected": "unbound"
+    }
+  ],
+  "runtimePatches": [
+    {
+      "id": "pro-video-isz",
+      "featureIds": [
+        "MD-02"
+      ],
+      "implementedBy": "module/post-fs-data.sh:129-146",
+      "target": "/odm/etc/camera/CameraHWConfiguration.config",
+      "gate": "disable_pro_video_isz",
+      "expects": {
+        "section": "InsensorZoom",
+        "rowRange": [
+          25,
+          40
+        ],
+        "columnCount": 14,
+        "zeroColumns": [
+          12,
+          13
+        ],
+        "hits": 16
+      },
+      "measured": {
+        "section": "InsensorZoom",
+        "rows": 11,
+        "commentedRows": 2,
+        "columnCounts": [
+          9
+        ]
+      },
+      "applicable": false,
+      "reason": "X8 Ultra [InsensorZoom] has 11 active rows (2 commented) with 9 columns; the patch needs rows 25..40 with 14 columns, so the script logs 'pro video isz skipped' and leaves stock untouched"
+    }
+  ],
+  "deviceOnlyTuning": {
+    "note": "payload 的 ISP 调优是 X9 Ultra（SM8850/lighthouse）构建，本机按 SoC 代号 zf* 命名；绑定等于把别的镜头调到 X8 Ultra 上。因此 4 个 isp 条目全部 expected=skipped，绑定量为 0 才是正确结果，不是失败。",
+    "deviceFiles": [
+      "com.qti.tuned.zffront.bin",
+      "com.qti.tuned.zfmain.bin",
+      "com.qti.tuned.zftele.bin",
+      "com.qti.tuned.zfultratele.bin",
+      "com.qti.tuned.zfultrawide.bin"
+    ]
+  },
+  "expectedSummary": {
+    "ready": 6,
+    "skipped": 4
+  }
+}
