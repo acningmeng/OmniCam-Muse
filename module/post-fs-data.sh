@@ -4,6 +4,11 @@ MODDIR=${0%/*}
 LOG=$MODDIR/bind.log
 set -u
 
+# Layer helpers: device.sh decides which device this is, mount-state.sh records what we bind so the
+# next boot releases exactly our own mounts instead of everything under a path prefix.
+. "$MODDIR/device.sh"
+. "$MODDIR/mount-state.sh"
+
 log() {
     echo "$1" >> "$LOG"
 }
@@ -15,6 +20,7 @@ bind_file() {
     chmod 0644 "$SOURCE"
     chcon u:object_r:vendor_configs_file:s0 "$SOURCE" 2>/dev/null || true
     if mount --bind "$SOURCE" "$TARGET" >> "$LOG" 2>&1; then
+        mount_state_record "$SOURCE" "$TARGET"
         log "file bind ok $TARGET"
     else
         log "file bind FAIL $TARGET"
@@ -57,16 +63,48 @@ bind_merged_dir() {
 : > "$LOG"
 log "begin"
 
-# Release our configuration and resource binds before rebuilding their sources.
-# Hybrid Mount and post-mount.sh manage the separate /odm/lib64 mount tree.
-for TARGET in $(awk -v root="${MODDIR#/data}/" 'index($4, root) == 1 && index($5, "/odm/etc/") == 1 { print $1, $5 }' /proc/self/mountinfo | sort -rn | cut -d ' ' -f 2); do
-    log "release $TARGET"
-    umount -l "$TARGET" >> "$LOG" 2>&1 || exit 1
-done
+# Release only the binds we recorded last boot (mount-state.sh compares the mountinfo root field, so
+# another module's mount on the same path is left alone).
+mount_state_release
 
-for NAME in camera_unit_config camera_unit_feature_config.protobuf oplus_camera_config oplus_camera_algo_switch_config oplus_camera_aps_config oplus_camera_preview_decision_config.json; do
-    bind_file "$MODDIR/payload/$NAME" "/odm/etc/camera/config/$NAME"
-done
+# Layers, all off by default. Turn one on, soft-reboot, run tools/x8u_selftest.sh, then move on.
+#   L2 enable_config_binds   camera_unit_config + camera_unit_feature_config.protobuf
+#   L3 enable_algo_switch    oplus_camera_algo_switch_config (POP / GR shutter gate)
+#   L4 enable_occ_extras     oplus_camera_config (palette and GR metadata tags)
+#   legacy: enable_legacy_configs  aps + preview_decision (X9 Ultra builds, only if asked)
+if [ "${MUSE_PROFILE:-unknown}" = "unknown" ]; then
+    log "layer L2+ skipped: unknown device (MUSE_PROFILE=unknown)"
+fi
+
+if [ -f "$MODDIR/enable_config_binds" ] && [ "${MUSE_PROFILE:-unknown}" != "unknown" ]; then
+    for NAME in camera_unit_config camera_unit_feature_config.protobuf; do
+        bind_file "$MODDIR/payload/$NAME" "/odm/etc/camera/config/$NAME"
+    done
+    log "layer L2 config binds on"
+else
+    log "layer L2 config binds off (touch enable_config_binds)"
+fi
+
+if [ -f "$MODDIR/enable_algo_switch" ] && [ "${MUSE_PROFILE:-unknown}" != "unknown" ]; then
+    bind_file "$MODDIR/payload/oplus_camera_algo_switch_config" /odm/etc/camera/config/oplus_camera_algo_switch_config
+    log "layer L3 algo switch on"
+else
+    log "layer L3 algo switch off (touch enable_algo_switch)"
+fi
+
+if [ -f "$MODDIR/enable_occ_extras" ] && [ "${MUSE_PROFILE:-unknown}" != "unknown" ]; then
+    bind_file "$MODDIR/payload/oplus_camera_config" /odm/etc/camera/config/oplus_camera_config
+    log "layer L4 occ extras on"
+else
+    log "layer L4 occ extras off (touch enable_occ_extras)"
+fi
+
+if [ -f "$MODDIR/enable_legacy_configs" ]; then
+    for NAME in oplus_camera_aps_config oplus_camera_preview_decision_config.json; do
+        bind_file "$MODDIR/payload/$NAME" "/odm/etc/camera/config/$NAME"
+    done
+    log "legacy X9 configs on"
+fi
 # Forced shutter sound stream at the system volume curve (see tools/patch_audio_volumes.py).
 bind_file "$MODDIR/payload/audio_policy_volumes.xml" /odm/etc/audio/audio_policy_volumes.xml
 

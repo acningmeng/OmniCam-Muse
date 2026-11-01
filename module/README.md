@@ -18,3 +18,27 @@
 刷入模块并重启：刷入时模块安装包内 APK（`pm install -r -d`，结果写入模块目录的 `install.log`，签名不一致等失败不卸载已装应用），重启后相机、相册和系统框架都加载新版。同 ID 的模块原位更新。停用模块并重启即回退全部挂载。设置保存后相机下次读取即生效；快门声设置在铃声模式变化或重启相机后生效。
 
 `post-fs-data.sh` 重建资源前，先延迟卸载本模块在 `/odm/etc/` 的配置与资源绑定，再从原厂目录合并资源，支持 KSU 软重启时重复执行。`/odm/lib64` 的库挂载由 Hybrid Mount 与 `post-mount.sh` 管理。
+
+
+## 分层开关（x8u-rebuild 分支）
+
+默认**只跑 L0（设备闸门 + 资源 staging + 日志）与 L1（符号层 hook）**，配置层全部关着。
+每层一个标记文件，开了之后 `ksud soft-reboot`，再用 `tools/x8u_selftest.sh` 验收，通过了再开下一层：
+
+| 层 | 标记文件 | 作用 | 验收 |
+| --- | --- | --- | --- |
+| L2 | `enable_config_binds` | `camera_unit_config` + `camera_unit_feature_config.protobuf` | `x8u_selftest.sh shoot`（照片模式） |
+| L3 | `enable_algo_switch` | `oplus_camera_algo_switch_config`（POP/理光快门的前提） | `x8u_selftest.sh shoot`（POP、理光各一次） |
+| L4 | `enable_occ_extras` | `oplus_camera_config` 的增补标签（调色板/GR 元数据） | 同上，另看 `iPaletteFlag` |
+| legacy | `enable_legacy_configs` | 两份 X9 Ultra 构建的 aps/preview_decision | 一般不用 |
+
+任何一层出问题：删掉对应标记文件 → `ksud soft-reboot` → 回到上一层，**不要**在运行期
+`mount --bind` 换 `/odm/etc/camera/config/*`（相机 provider 在启动时就持有该文件，热换只会黑屏）。
+
+`x8u_selftest.sh` 只读：`gate`（机型/固件/相机版本/标记）、`hooks`（LSPosed 是否注入相机与相册）、
+`mounts`（哪几份配置在绑、合并目录是否完整）、`shoot`（按一次快门前后比对媒体库）、`all`。
+
+系统侧的三个「别做」：
+- 不要 `killall lspd`（会把 zygote 拖死）；要停 hook 只在 LSPosed 管理器里改作用域。
+- 不要用 `adb reboot` 代替 `ksud soft-reboot`（会丢临时 root）。
+- 不要手改 `/data/adb/lspd/config/modules_config.db`（WAL 里存着 schema，只拷主库会把注册表写空）。
