@@ -44,6 +44,8 @@ SRC+=("$PROJECT/app/src/main/java/local/jiege/settings/MasterLooks.java")
 SRC+=("$HERE/StoreOfflineTest.java")
 SRC+=("$HERE/FiltersOfflineTest.java")
 SRC+=("$HERE/LutBakerOfflineTest.java")
+SRC+=("$HERE/CompositionHeuristicTest.java")
+SRC+=("$PROJECT/app/src/main/java/local/jiege/hook/composition/CompositionHeuristic.java")
 
 javac -encoding UTF-8 -d "$OUT" -cp "$CP:$ANDROID_JAR" "${SRC[@]}"
 
@@ -51,4 +53,5 @@ java -Dfile.encoding=UTF-8 -cp "$CP:$ANDROID_JAR" FiltersOfflineTest
 java -Dfile.encoding=UTF-8 -cp "$CP:$ANDROID_JAR" LutBakerOfflineTest "$PROJECT"
 java -Dfile.encoding=UTF-8 -cp "$CP:$ANDROID_JAR" StoreOfflineTest "$PROJECT"
 java -cp "$OUT" MasterLooksOfflineTest
+java -Dfile.encoding=UTF-8 -cp "$OUT" CompositionHeuristicTest
 echo "offline tests: ok"

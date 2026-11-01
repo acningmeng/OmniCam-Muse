@@ -112,6 +112,7 @@ public final class ModuleEntry implements IXposedHookLoadPackage, IXposedHookZyg
             HighPixelEffects.installCamera(classLoader);
             TiltShiftCapture.installCamera(classLoader);
             SeamlessBlurGuard.installCamera(classLoader);
+            local.jiege.hook.composition.CompositionBridge.installCamera(classLoader);
             KeyLaunchMode.installCamera(classLoader);
             Log.guard("CameraLog", "camera log mirror", () -> CameraLogMirror.install(classLoader));
             MasterFilterCompletion.installCamera(classLoader);

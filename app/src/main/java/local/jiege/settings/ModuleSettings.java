@@ -88,6 +88,9 @@ public final class ModuleSettings {
     /** 哈苏超清: real 200MP readout without the big-face condition (applies after the camera restarts). */
     public static final String HIGH_PIXEL_200M_NO_FACE = "high_pixel_200m_no_face";
 
+    /** 灵感构图: score the preview on the phone instead of waiting for the aiunit composition unit. */
+    public static final String AI_COMPOSITION = "ai_composition";
+
     /** Photo, portrait and 哈苏超清 (with its palette) list the master filters in the master order (applies after the camera restarts). */
     public static final String NORMAL_FOLLOWS_MASTER = "normal_follows_master";
 
@@ -183,6 +186,7 @@ public final class ModuleSettings {
             case XPAN_CLEAN_LARGE_MASK:
             case XPAN_CLEAN_ANIMATION:
             case HIGH_PIXEL_200M_NO_FACE:
+            case AI_COMPOSITION:
                 return false;
             case POP_HIGH_PIXEL:
             case UNLOCK_25MP:
