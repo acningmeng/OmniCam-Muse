@@ -572,11 +572,6 @@
       "consumer": "com.oplus.camera shared_prefs"
     },
     {
-      "key": "com.oplus.feature.colorful.screen.torch.config",
-      "value": "111",
-      "consumer": "com.oplus.camera shared_prefs"
-    },
-    {
       "key": "com.oplus.flashlevel.configurable.support",
       "value": "1",
       "consumer": "com.oplus.camera shared_prefs"
@@ -593,6 +588,16 @@
     },
     {
       "key": "ai_composition_entry_guide_shown_v2",
+      "value": "1",
+      "consumer": "com.oplus.camera shared_prefs"
+    },
+    {
+      "key": "com.oplus.feature.aicomposition.realscene.support",
+      "value": "1",
+      "consumer": "com.oplus.camera shared_prefs"
+    },
+    {
+      "key": "com.oplus.feature.aicomposition.inspiration.support",
       "value": "1",
       "consumer": "com.oplus.camera shared_prefs"
     }

@@ -186,12 +186,8 @@ public final class ModuleSettings {
             case XPAN_CLEAN_LARGE_MASK:
             case XPAN_CLEAN_ANIMATION:
             case HIGH_PIXEL_200M_NO_FACE:
-            // 灵感构图: the entry gate is already opened by a dedicated module (com.linggan.goutu) on
-            // devices that install one; stacking a second hook on the same method buys nothing, so the
-            // built-in gate stays opt-in.
-            case AI_COMPOSITION:
-                return false;
             case POP_HIGH_PIXEL:
+            case AI_COMPOSITION:
             case UNLOCK_25MP:
             case HIGH_PIXEL_EFFECTS:
             case SHUTTER_IN_SILENT:

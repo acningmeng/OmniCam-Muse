@@ -20,7 +20,7 @@
   "source": {
     "keySource": "/odm/lib64/libOplusSecurity.so +0x7AB, 32 bytes ^0x3F, every other byte",
     "codec": "aes-ecb envelope (01 01) or plain json",
-    "x9PayloadSha256": "62bbfd05345590aff707fbe0d1d633fbd75e6944d7a0336e0f1d11e80427b9d9"
+    "x9PayloadSha256": "01d635e3fe1623b4bbc1a44263970fd0d89b23ca7ce63f21b3bb3bfd259de1cb"
   },
   "targets": [
     {

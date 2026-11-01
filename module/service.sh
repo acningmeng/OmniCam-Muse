@@ -101,19 +101,20 @@ restorecon -R "$APP/files/jiege"
 ASSET_DIR="$APP/files/pop_port"
 PLD_APP="$APP/files/odm/etc/camera/pld_watermark"
 set_config com.oplus.feature.retro.camera.support 1
-# POP preview needs the inverse-mask shader. GLES20Canvas builds that program only when the low bit of
-# this config integer has bit 2 set ((v & 4) == 4, ia.n0.i0), and the X8 Ultra vendor tag list has no such
-# key at all, so j0 stays null and the first draw through GLES20Canvas.p0 throws inside
-# CameraPreviewUI.Ug -> NPE on the PreviewGLThread. The X9 Ultra value is 111; anything with bit 2 works.
-set_config com.oplus.feature.colorful.screen.torch.config 111
 # Flash brightness slider (柔和/反差); the camera drives it through com.oplus.flash.IntensityControl.
 set_config com.oplus.flashlevel.configurable.support 1
 set_config com.oplus.feature.tilt.shift.photo.support 1
-# AI composition: the switch state is the stock DataKey of AICompositionFeatureKeys. The feature-table
-# gate (isSupportAIComposition) is opened by the AiComposition hook; the entry guide is marked as seen so
+# AI composition: the switch state is the stock DataKey of AICompositionFeatureKeys. The entry itself is
+# gated twice — the feature table carries com.oplus.camera.feature.ai_composition (bound from payload),
+# and the camera reads two config bits through CameraConfig.d in
+# aicomposition/view/y2: realscene.support (on-device framing hints) and inspiration.support (cloud
+# inspiration). Both tags are absent on this device's oplus_camera_config, so the entry stays collapsed
+# unless they are supplied here. key_ai_composition keeps the switch on; the guide is marked as seen so
 # the first open does not sit on the guide video.
 set_config key_ai_composition 1
 set_config ai_composition_entry_guide_shown_v2 1
+set_config com.oplus.feature.aicomposition.realscene.support 1
+set_config com.oplus.feature.aicomposition.inspiration.support 1
 # Tilt-shift: mode_data.db is built once from the feature flags. If it has no tiltShift row yet, drop it once
 # (the marker keeps this to a single time) so the camera recreates it with the tilt-shift flag on.
 TILT_MARK="$MODDIR/tilt_db_reset"
