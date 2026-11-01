@@ -8,6 +8,10 @@ log() {
     echo "$1" >> "$LOG"
 }
 
+# Records the binds this script makes so the next boot releases only those (module/mount-state.sh).
+. "$MODDIR/device.sh"
+. "$MODDIR/mount-state.sh"
+
 bind_file() {
     SOURCE="$1"
     TARGET="$2"
@@ -16,6 +20,7 @@ bind_file() {
     chcon u:object_r:vendor_configs_file:s0 "$SOURCE" 2>/dev/null || true
     if mount --bind "$SOURCE" "$TARGET" >> "$LOG" 2>&1; then
         log "file bind ok $TARGET"
+        mount_state_record "$SOURCE" "$TARGET"
     else
         log "file bind FAIL $TARGET"
     fi
@@ -39,16 +44,26 @@ bind_merged_dir() {
         log "missing live $LIVE"
         return 0
     fi
+    # If the target is still a bind from an earlier run, release it first: copying the live tree while
+    # it is our own destination would read the bind and empty the source.
+    if mount_state_owned "$DEST" "$TARGET"; then
+        umount -l "$TARGET" >> "$LOG" 2>&1 && log "release stale dir bind $TARGET"
+    fi
     rm -rf "$DEST"
     mkdir -p "$DEST"
     cp -a "$LIVE"/. "$DEST"/
     if [ -d "$EXTRA" ]; then
         cp -a "$EXTRA"/. "$DEST"/
     fi
+    if [ -z "$(ls "$DEST")" ]; then
+        log "merge produced nothing for $TARGET, leaving the stock tree alone"
+        return 0
+    fi
     label_tree "$DEST"
     log "live_count=$(ls "$LIVE" | wc -l) merged_count=$(ls "$DEST" | wc -l)"
     if mount --bind "$DEST" "$TARGET" >> "$LOG" 2>&1; then
         log "dir bind ok $TARGET"
+        mount_state_record "$DEST" "$TARGET"
     else
         log "dir bind FAIL $TARGET"
     fi
@@ -57,19 +72,18 @@ bind_merged_dir() {
 : > "$LOG"
 log "begin"
 
-# Release our configuration and resource binds before rebuilding their sources.
-# Hybrid Mount and post-mount.sh manage the separate /odm/lib64 mount tree.
-for TARGET in $(awk -v root="${MODDIR#/data}/" 'index($4, root) == 1 && index($5, "/odm/etc/") == 1 { print $1, $5 }' /proc/self/mountinfo | sort -rn | cut -d ' ' -f 2); do
-    log "release $TARGET"
-    umount -l "$TARGET" >> "$LOG" 2>&1 || exit 1
-done
+# Release the binds this module made last boot before rebuilding their sources. Only the pairs we
+# recorded are touched: /odm/etc/camera is shared with whatever else the user runs, and unmounting by
+# path prefix took those with it (a foreign bind of basictone left POP without its tone tables and the
+# preview froze). Hybrid Mount and post-mount.sh manage the separate /odm/lib64 tree.
+mount_state_release
 
 # The payload configs were captured from the X9 Ultra: they name lighthouse* sensors and carry every
 # X9 Ultra mode. On a device with a different sensor set (Find X8 Ultra / SM8750) they may not parse,
 # so touch $MODDIR/disable_config_binds to keep the stock configuration and only run the LUT/hook
 # layers. The ISZ patch below reads the live file and skips itself when the layout differs.
-if [ -f "$MODDIR/disable_config_binds" ]; then
-    log "config binds disabled"
+if [ "$MUSE_CONFIG_BINDS" != 1 ]; then
+    log "config binds disabled (profile $MUSE_PROFILE)"
 else
     # Rebased on this device's own files (see module/profiles/x8u/deltas.json): the payload is the
     # live config plus the X9 Ultra-only entries, so binding it can only add modes.
