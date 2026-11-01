@@ -14,6 +14,8 @@ import re
 import sys
 from pathlib import Path
 
+import oplus_config
+
 import refs
 
 PROJECT = Path(__file__).resolve().parent.parent
@@ -61,8 +63,7 @@ REMOVE = {
 
 def config_key() -> bytes:
     """AES key of the OPLUS camera configs, read from the stock libOplusSecurity.so."""
-    security = (refs.PULLED_LIBS / "libOplusSecurity.so").read_bytes()
-    return bytes(value ^ 0x3F for value in security[0x7AB : 0x7AB + 32])[::2]
+    return oplus_config.key_from_security(refs.PULLED_LIBS / "libOplusSecurity.so")
 
 POP_BRANCH = {"and3": {
     "eq": ["captureMode", "APS_CAPMODE_REAR_NORMAL"],
@@ -111,10 +112,10 @@ def pop_basictone(text: str) -> str:
 
 def decrypt(path: Path) -> bytes:
     data = path.read_bytes()
-    if data[:2] == b"\x01\x01":
+    if oplus_config.is_enveloped(data):
         if data[-1] != 0xFF:
             raise RuntimeError(f"Unexpected encrypted config envelope: {path}")
-        data = unpad(AES.new(config_key(), AES.MODE_ECB).decrypt(data[4:-4]), 16)
+        return oplus_config.decode(data, config_key()).encode("utf-8")
     return data
 
 

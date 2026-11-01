@@ -20,6 +20,10 @@ import sys
 import zipfile
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+import oplus_config  # noqa: E402  (needs the path above)
+
 PROJECT = Path(__file__).resolve().parent.parent.parent
 MODULE = PROJECT / "module"
 OUT = MODULE / "profiles/x8u"
@@ -347,15 +351,13 @@ def shipped_payload(name: str) -> bytes:
 
 
 def plain(data: bytes, key: bytes) -> bytes:
-    if data[:2] != b"\x01\x01":
+    if not oplus_config.is_enveloped(data):
         return data
-    from Crypto.Cipher import AES
-    from Crypto.Util.Padding import unpad
-    return unpad(AES.new(key, AES.MODE_ECB).decrypt(data[4:-4]), 16)
+    return oplus_config.decode(data, key).encode("utf-8")
 
 
 def config_key(security: Path) -> bytes:
-    return bytes(value ^ 0x3F for value in security.read_bytes()[0x7AB:0x7AB + 32])[::2]
+    return oplus_config.key_from_security(security)
 
 
 DELTA_FEATURE = {

@@ -28,7 +28,7 @@ import argparse
 import json
 from pathlib import Path
 
-from Crypto.Cipher import AES
+import oplus_config
 
 KEY = bytes.fromhex("6f2170406c247525535e4326412a4d28")
 ENVELOPE_HEAD = 4
@@ -49,11 +49,7 @@ WANTED = [
 
 
 def decode(raw: bytes) -> str:
-    if raw[:2] != b"\x01\x01":
-        return raw.decode("utf-8")
-    body = raw[ENVELOPE_HEAD:len(raw) - ENVELOPE_TAIL]
-    plain = AES.new(KEY, AES.MODE_ECB).decrypt(body)
-    return plain[:-plain[-1]].decode("utf-8")
+    return oplus_config.decode(raw, KEY)
 
 
 def records(text: str) -> dict:
