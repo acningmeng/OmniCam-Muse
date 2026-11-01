@@ -115,6 +115,8 @@ set_config key_ai_composition 1
 set_config ai_composition_entry_guide_shown_v2 1
 set_config com.oplus.feature.aicomposition.realscene.support 1
 set_config com.oplus.feature.aicomposition.inspiration.support 1
+set_config com.oplus.feature.aicomposition.inspiration.default.oaid 0358B7AE646DFC91AC63CDF245B6FDCDFE08391BFF10F779D788203DB1272C60
+set_config com.oplus.feature.aicomposition.inspiration.aes.key 5ZAQ0+UKt/L/0FTmN516mGa4JlKyhWIs2YIRiRoB/c8=
 # Tilt-shift: mode_data.db is built once from the feature flags. If it has no tiltShift row yet, drop it once
 # (the marker keeps this to a single time) so the camera recreates it with the tilt-shift flag on.
 TILT_MARK="$MODDIR/tilt_db_reset"
