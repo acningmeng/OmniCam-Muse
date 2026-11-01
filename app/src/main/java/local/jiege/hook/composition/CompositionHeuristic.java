@@ -139,7 +139,8 @@ public final class CompositionHeuristic {
         if (s.score >= SCORE_OK) {
             return s.tip;
         }
-        return s.tip;
+        // Below the bar the panel should coach the move, not show a number that means nothing to the user.
+        return s.tip + "（先调整再拍）";
     }
 
     private static float nearestThird(float v) {

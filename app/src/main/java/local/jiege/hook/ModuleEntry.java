@@ -111,6 +111,10 @@ public final class ModuleEntry implements IXposedHookLoadPackage, IXposedHookZyg
             X10FilterPort.installCamera(classLoader);
             HighPixelEffects.installCamera(classLoader);
             TiltShiftCapture.installCamera(classLoader);
+            // Feature table swap: ProtobufParser.initFeatureInfo asks for the operation table of
+            // every mode the table lists; modes the device config does not carry answer null and the
+            // caller NPEs in HashMap.putMapEntries. Empty map keeps the mode, drops the overrides.
+            local.jiege.hook.common.FeatureModeCompat.installCamera(classLoader);
             SeamlessBlurGuard.installCamera(classLoader);
             local.jiege.hook.composition.CompositionBridge.installCamera(classLoader);
             KeyLaunchMode.installCamera(classLoader);

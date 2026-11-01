@@ -13,6 +13,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import re
 import subprocess
 import sys
@@ -24,6 +25,9 @@ MODULE = PROJECT / "module"
 OUT = MODULE / "profiles/x8u"
 GIT = ("/Library/Developer/CommandLineTools/usr/bin/git"
        if Path("/Library/Developer/CommandLineTools/usr/bin/git").exists() else "git")
+# The X9 Ultra payload this port reads from must stay pinned: HEAD moves as soon as the ported
+# payload is committed, and then "rebuild from the shipped file" would read our own output back.
+BASE_REV = os.environ.get("MUSE_BASE_REV", "03f199c")
 
 PROFILE_ID = "pku110-17.0.0.104-camera-7.006.123"
 
@@ -87,8 +91,11 @@ def manifest(dump: Path) -> dict[str, list]:
 def api_level(android_version: int) -> int:
     adb = Path.home() / "Library/Android/sdk/platform-tools/adb"
     if adb.exists():
-        value = subprocess.run([str(adb), "shell", "getprop ro.build.version.sdk"],
-                               capture_output=True, text=True).stdout.strip()
+        try:
+            value = subprocess.run([str(adb), "shell", "getprop ro.build.version.sdk"],
+                                   capture_output=True, text=True, timeout=5).stdout.strip()
+        except (subprocess.SubprocessError, OSError):
+            value = ""
         if value.isdigit():
             return int(value)
     return {16: 36, 17: 37}.get(android_version, 0)
@@ -221,7 +228,7 @@ def entries(tree: dict[str, int]) -> list[dict]:
     rows = []
     for name, gate, verdict in CONFIGS:
         target = "/odm/etc/camera/config/%s" % name
-        gate_chain = "enable_stale_config_binds,disable_config_binds" if gate else "disable_config_binds"
+        gate_chain = ("%s,disable_config_binds" % gate) if gate else "disable_config_binds"
         if target not in tree:
             expected = "skipped:target-missing"
         elif gate:
@@ -335,8 +342,8 @@ def mounts_doc(dump: Path) -> dict:
 
 
 def shipped_payload(name: str) -> bytes:
-    return subprocess.run([GIT, "show", "HEAD:module/payload/%s" % name], cwd=PROJECT,
-                          capture_output=True, check=True).stdout
+    return subprocess.run([GIT, "show", "%s:module/payload/%s" % (BASE_REV, name)], cwd=PROJECT,
+                          check=True, capture_output=True).stdout
 
 
 def plain(data: bytes, key: bytes) -> bytes:

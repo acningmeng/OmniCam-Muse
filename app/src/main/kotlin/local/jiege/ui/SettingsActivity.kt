@@ -205,6 +205,17 @@ private fun SettingsScreen(store: SettingsStore) {
 
 /** The 拍摄 tab: settings grouped by camera mode. */
 private fun LazyListScope.shootItems(store: SettingsStore, cardModifier: Modifier, onOpenSoftLight: () -> Unit, onOpenXpanClean: () -> Unit) {
+    item(key = "composition") {
+        SmallTitle(text = "构图")
+        Card(modifier = cardModifier) {
+            SettingSwitch(
+                store,
+                ModuleSettings.AI_COMPOSITION,
+                title = "灵感构图",
+                summary = "打开相机里的灵感构图入口，并在本机算评分与提示。装第三方云方案时关掉这个，避免两边抢同一个配置位",
+            )
+        }
+    }
     item(key = "filter_panel") {
         // Index = ModuleSettings.FILTER_PANEL_NONE / _SWIPE_UP / _LONG_PRESS.
         var trigger by remember { mutableStateOf(store.getInt(ModuleSettings.FILTER_PANEL_TRIGGER)) }

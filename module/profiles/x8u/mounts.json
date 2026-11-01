@@ -19,7 +19,7 @@
         "payload/camera_unit_config"
       ],
       "target": "/odm/etc/camera/config/camera_unit_config",
-      "gate": "enable_stale_config_binds,disable_config_binds",
+      "gate": "enable_config_binds,disable_config_binds",
       "verdict": "rebased:device-plus-x9-entries",
       "selinux": "vendor_configs_file",
       "policy": "skip-if-missing",
@@ -36,7 +36,7 @@
         "payload/camera_unit_feature_config.protobuf"
       ],
       "target": "/odm/etc/camera/config/camera_unit_feature_config.protobuf",
-      "gate": "enable_stale_config_binds,disable_config_binds",
+      "gate": "enable_config_binds,disable_config_binds",
       "verdict": "feature-table",
       "selinux": "vendor_configs_file",
       "policy": "skip-if-missing",
@@ -54,7 +54,7 @@
         "payload/oplus_camera_algo_switch_config"
       ],
       "target": "/odm/etc/camera/config/oplus_camera_algo_switch_config",
-      "gate": "enable_stale_config_binds,disable_config_binds",
+      "gate": "enable_algo_switch,disable_config_binds",
       "verdict": "generated:algo-switch",
       "selinux": "vendor_configs_file",
       "policy": "skip-if-missing",
@@ -72,7 +72,7 @@
         "payload/oplus_camera_config"
       ],
       "target": "/odm/etc/camera/config/oplus_camera_config",
-      "gate": "enable_stale_config_binds,disable_config_binds",
+      "gate": "enable_occ_extras,disable_config_binds",
       "verdict": "rebased:occ-extras",
       "selinux": "vendor_configs_file",
       "policy": "skip-if-missing",
@@ -89,7 +89,7 @@
         "payload/oplus_camera_preview_decision_config.json"
       ],
       "target": "/odm/etc/camera/config/oplus_camera_preview_decision_config.json",
-      "gate": "enable_stale_config_binds,disable_config_binds",
+      "gate": "enable_legacy_configs,disable_config_binds",
       "verdict": "legacy:x9-build",
       "selinux": "vendor_configs_file",
       "policy": "skip-if-missing",
@@ -106,7 +106,7 @@
         "payload/oplus_camera_aps_config"
       ],
       "target": "/odm/etc/camera/config/oplus_camera_aps_config",
-      "gate": "enable_stale_config_binds,disable_config_binds",
+      "gate": "enable_legacy_configs,disable_config_binds",
       "verdict": "legacy:x9-build",
       "selinux": "vendor_configs_file",
       "policy": "skip-if-missing",

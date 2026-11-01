@@ -32,7 +32,7 @@ label_tree() {
     chown -R root:root "$DIR"
     find "$DIR" -type d -exec chmod 0755 {} \;
     find "$DIR" -type f -exec chmod 0644 {} \;
-    find "$DIR" -exec chcon u:object_r:vendor_configs_file:s0 {} \; 2>>"$LOG" || true
+    chcon -R u:object_r:vendor_configs_file:s0 "$DIR" 2>>"$LOG" || true
 }
 
 bind_merged_dir() {
@@ -41,6 +41,11 @@ bind_merged_dir() {
     DEST=$3
     TARGET=$4
     log "merge $TARGET from $LIVE"
+    # If last boot's bind is still on TARGET, LIVE is that bind and DEST is its source: deleting DEST
+    # would leave TARGET pointing at a deleted tree and the merge would copy nothing. Release first.
+    if mount_state_owned "$DEST" "$TARGET"; then
+        umount -l "$TARGET" >> "$LOG" 2>&1 && log "release stale $TARGET"
+    fi
     if [ ! -d "$LIVE" ]; then
         log "missing live $LIVE"
         return 0
@@ -54,12 +59,14 @@ bind_merged_dir() {
     label_tree "$DEST"
     log "live_count=$(ls "$LIVE" | wc -l) merged_count=$(ls "$DEST" | wc -l)"
     if mount --bind "$DEST" "$TARGET" >> "$LOG" 2>&1; then
+        mount_state_record "$DEST" "$TARGET"
         log "dir bind ok $TARGET"
     else
         log "dir bind FAIL $TARGET"
     fi
 }
 
+[ -f "$LOG" ] && mv -f "$LOG" "$LOG.prev"
 : > "$LOG"
 log "begin"
 
@@ -76,7 +83,7 @@ if [ "${MUSE_PROFILE:-unknown}" = "unknown" ]; then
     log "layer L2+ skipped: unknown device (MUSE_PROFILE=unknown)"
 fi
 
-if [ -f "$MODDIR/enable_config_binds" ] && [ "${MUSE_PROFILE:-unknown}" != "unknown" ]; then
+if [ -f "$MODDIR/enable_config_binds" ] && [ "${MUSE_PROFILE:-unknown}" != "unknown" ] && [ "$MUSE_CONFIG_BINDS" = 1 ]; then
     for NAME in camera_unit_config camera_unit_feature_config.protobuf; do
         bind_file "$MODDIR/payload/$NAME" "/odm/etc/camera/config/$NAME"
     done
@@ -85,25 +92,27 @@ else
     log "layer L2 config binds off (touch enable_config_binds)"
 fi
 
-if [ -f "$MODDIR/enable_algo_switch" ] && [ "${MUSE_PROFILE:-unknown}" != "unknown" ]; then
+if [ -f "$MODDIR/enable_algo_switch" ] && [ "${MUSE_PROFILE:-unknown}" != "unknown" ] && [ "$MUSE_CONFIG_BINDS" = 1 ]; then
     bind_file "$MODDIR/payload/oplus_camera_algo_switch_config" /odm/etc/camera/config/oplus_camera_algo_switch_config
     log "layer L3 algo switch on"
 else
     log "layer L3 algo switch off (touch enable_algo_switch)"
 fi
 
-if [ -f "$MODDIR/enable_occ_extras" ] && [ "${MUSE_PROFILE:-unknown}" != "unknown" ]; then
+if [ -f "$MODDIR/enable_occ_extras" ] && [ "${MUSE_PROFILE:-unknown}" != "unknown" ] && [ "$MUSE_CONFIG_BINDS" = 1 ]; then
     bind_file "$MODDIR/payload/oplus_camera_config" /odm/etc/camera/config/oplus_camera_config
     log "layer L4 occ extras on"
 else
     log "layer L4 occ extras off (touch enable_occ_extras)"
 fi
 
-if [ -f "$MODDIR/enable_legacy_configs" ]; then
+if [ -f "$MODDIR/enable_legacy_configs" ] && [ "${MUSE_PROFILE:-unknown}" != "unknown" ] && [ "$MUSE_CONFIG_BINDS" = 1 ]; then
     for NAME in oplus_camera_aps_config oplus_camera_preview_decision_config.json; do
         bind_file "$MODDIR/payload/$NAME" "/odm/etc/camera/config/$NAME"
     done
     log "legacy X9 configs on"
+elif [ -f "$MODDIR/enable_legacy_configs" ]; then
+    log "legacy marker present but skipped (profile=$MUSE_PROFILE config_binds=$MUSE_CONFIG_BINDS)"
 fi
 # Forced shutter sound stream at the system volume curve (see tools/patch_audio_volumes.py).
 bind_file "$MODDIR/payload/audio_policy_volumes.xml" /odm/etc/audio/audio_policy_volumes.xml
@@ -132,6 +141,7 @@ for LENS in main wide tele ultratele; do
     chmod 0644 "$SOURCE"
     chcon u:object_r:vendor_file:s0 "$SOURCE" 2>>"$LOG" || true
     if mount --bind "$SOURCE" "$TARGET" >>"$LOG" 2>&1; then
+        mount_state_record "$SOURCE" "$TARGET"
         log "isp bind ok $TARGET"
     else
         log "isp bind FAIL $TARGET"

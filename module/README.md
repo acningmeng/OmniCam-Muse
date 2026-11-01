@@ -32,6 +32,9 @@
 | L4 | `enable_occ_extras` | `oplus_camera_config` 的增补标签（调色板/GR 元数据） | 同上，另看 `iPaletteFlag` |
 | legacy | `enable_legacy_configs` | 两份 X9 Ultra 构建的 aps/preview_decision | 一般不用 |
 
+四个标记都还受 `MUSE_CONFIG_BINDS` 约束：非 X8U/X9U 机型（`MUSE_PROFILE=unknown`）或存在
+`disable_config_binds` 时一律不绑，只留 LUT/资源层。
+
 任何一层出问题：删掉对应标记文件 → `ksud soft-reboot` → 回到上一层，**不要**在运行期
 `mount --bind` 换 `/odm/etc/camera/config/*`（相机 provider 在启动时就持有该文件，热换只会黑屏）。
 
@@ -49,10 +52,12 @@ OPPO 相机的构图面板等的是一个 `com.oplus.aiunit.core.base.FrameDetec
 - `CompositionBridge`：钩 `com.oplus.ocs.camera.OplusAICompositionHelper` 与
   `com.oplus.camera.aicomposition.OplusAIComposition` 里参数带 Bitmap/Frame 的方法，偷预览帧、500 ms 节流、
   按字段名把分数与提示写回结果对象。找不到类或字段就只记一行日志，原厂路径不动（fail-open）。
-- 开关：`enable_composition` 标记文件（在模块目录里 `touch enable_composition` 后重启相机生效）。
-  设置项 `ai_composition` 默认 false —— 手机上装了第三方云方案时让它先跑，两者不要同时开。
+- 开关：Muse 设置里的「构图 → 灵感构图」（`ai_composition`，默认**开**）。打开后先由 `AiComposition`
+  把 `realscene.support` / `inspiration.support` 两个配置位强制为真（入口从 GONE 展开的必要条件），
+  再由 `CompositionBridge` 给面板打分。装了第三方云方案时把这一项关掉，两边不要同时改同一批配置位。
 
 系统侧的三个「别做」：
 - 不要 `killall lspd`（会把 zygote 拖死）；要停 hook 只在 LSPosed 管理器里改作用域。
 - 不要用 `adb reboot` 代替 `ksud soft-reboot`（会丢临时 root）。
 - 不要手改 `/data/adb/lspd/config/modules_config.db`（WAL 里存着 schema，只拷主库会把注册表写空）。
+- `bind.log` 每次开机滚动成 `bind.log.prev`，看上一轮为什么没挂上要看 `.prev`。

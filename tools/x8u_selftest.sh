@@ -40,14 +40,19 @@ profile() {
 hooks() {
     say "hooks:"
     for pkg in com.oplus.camera com.coloros.gallery3d; do
-        N=$(grep -c "($pkg)\[local.jiege.camera" /data/adb/lspd/log/verbose_*.log 2>/dev/null | tail -1)
+        # grep -c with several files prints "file:count"; sum the counts instead of taking the last line.
+        N=$(grep -h -c "($pkg)\[local.jiege.camera" /data/adb/lspd/log/verbose_*.log 2>/dev/null | awk '{s+=$1} END{print s+0}')
         [ -n "$N" ] && [ "$N" -gt 0 ] && ok "$pkg injected ($N frames)" || bad "$pkg not injected"
     done
     return 0
 }
 
-mounted() { # path -> prints "bound" or "stock"
-    if grep -q " $1 " /proc/self/mountinfo 2>/dev/null; then echo bound; else echo stock; fi
+mounted() { # path -> prints "bound" or "stock"; field 5 is the mount point, nothing else matches
+    if awk -v p="$1" '$5==p{found=1} END{exit !found}' /proc/self/mountinfo 2>/dev/null; then
+        echo bound
+    else
+        echo stock
+    fi
 }
 
 mounts() {

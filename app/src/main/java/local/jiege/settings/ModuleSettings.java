@@ -186,11 +186,11 @@ public final class ModuleSettings {
             case XPAN_CLEAN_LARGE_MASK:
             case XPAN_CLEAN_ANIMATION:
             case HIGH_PIXEL_200M_NO_FACE:
-            case AI_COMPOSITION:
                 return false;
             case POP_HIGH_PIXEL:
             case UNLOCK_25MP:
             case HIGH_PIXEL_EFFECTS:
+            case AI_COMPOSITION:
             case SHUTTER_IN_SILENT:
             case SHUTTER_IN_VIBRATE:
             case MASTER_EFFECT_NEON:

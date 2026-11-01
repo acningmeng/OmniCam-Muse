@@ -2,7 +2,7 @@
 
 The payload used to be edited in place by tools/port_x8u_config.py, which made the package
 irreproducible: a second run saw its own output as the base. This script always starts from the X9
-Ultra file committed at HEAD (git show HEAD:module/payload/<name>), applies the deltas archive in
+Ultra file committed at BASE_REV (git show <BASE_REV>:module/payload/<name>), applies the deltas archive in
 order, and writes a manifest with the digest of every payload file. `--check` recomputes and compares,
 so CI (and the packaging check) can tell a stale payload from a fresh one.
 
@@ -127,7 +127,7 @@ def check() -> int:
     outputs, _ = apply_deltas()
     for rel, data in outputs.items():
         if (MODULE / rel).read_bytes() != data:
-            problems.append("%s does not match a fresh synthesis from HEAD + deltas" % rel)
+            problems.append("%s does not match a fresh synthesis from the pinned base + deltas" % rel)
     for line in problems:
         print("MISMATCH %s" % line)
     print("payload check: %s (%d files)" % ("PASS" if not problems else "FAIL", len(current)))

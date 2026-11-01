@@ -3,7 +3,6 @@ package local.jiege.hook.composition;
 import android.graphics.Bitmap;
 import android.util.Log;
 
-import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Locale;
@@ -32,19 +31,27 @@ public final class CompositionBridge {
     private static final String TAG = "MuseComposition";
     private static final String HELPER = "com.oplus.ocs.camera.OplusAICompositionHelper";
     private static final String ALT_HELPER = "com.oplus.camera.aicomposition.OplusAIComposition";
-    private static final String GATE = "/data/adb/modules/ricoh_pop_x9u/enable_composition";
+    /** Same switch the settings page writes; read through the shared prefs helper, not a marker file. */
+    private static final String SETTING = local.jiege.settings.ModuleSettings.AI_COMPOSITION;
 
     private static final long INTERVAL_MS = 500L;
-    private static long sLastRun;
+    private static volatile long sLastRun;
     private static boolean sReportedFrameClass;
 
     private CompositionBridge() {
     }
 
     public static void installCamera(ClassLoader loader) {
-        if (!new File(GATE).exists()) {
-            Log.i(TAG, "local composition off (" + GATE + " missing)");
+        if (!local.jiege.hook.common.Settings.get(SETTING)) {
+            Log.i(TAG, "local composition off (setting " + SETTING + ")");
             return;
+        }
+        // Two halves: the entry has to be visible before there is a panel to score, so open the config
+        // bits first (AiComposition), then watch the helper that renders the suggestion.
+        try {
+            AiComposition.installCamera(loader);
+        } catch (Throwable t) {
+            Log.w(TAG, "entry opener unavailable: " + t);
         }
         int hooked = hookHelper(loader, HELPER) + hookHelper(loader, ALT_HELPER);
         Log.i(TAG, hooked > 0 ? "local composition installed on " + hooked + " method(s)"
@@ -104,10 +111,25 @@ public final class CompositionBridge {
         }
         sLastRun = now;
 
-        int w = frame.getWidth();
-        int h = frame.getHeight();
+        int sw = Math.min(frame.getWidth(), 320);
+        int sh = Math.max(8, frame.getHeight() * sw / Math.max(1, frame.getWidth()));
+        Bitmap small = null;
+        Bitmap src = frame;
+        if (frame.getWidth() > sw) {
+            try {
+                small = Bitmap.createScaledBitmap(frame, sw, sh, false);
+                src = small;
+            } catch (Throwable t) {
+                Log.w(TAG, "scale skipped: " + t);
+            }
+        }
+        int w = src.getWidth();
+        int h = src.getHeight();
         int[] pixels = new int[w * h];
-        frame.getPixels(pixels, 0, w, 0, 0, w, h);
+        src.getPixels(pixels, 0, w, 0, 0, w, h);
+        if (small != null && small != frame) {
+            small.recycle();
+        }
         CompositionHeuristic.Suggestion s = CompositionHeuristic.plan(w, h, pixels);
 
         Object result = param.getResult();
@@ -148,6 +170,16 @@ public final class CompositionBridge {
         return null;
     }
 
+    private static java.util.List<Field> allFields(Class<?> type) {
+        java.util.List<Field> out = new java.util.ArrayList<>();
+        for (Class<?> c = type; c != null && c != Object.class; c = c.getSuperclass()) {
+            for (Field f : c.getDeclaredFields()) {
+                out.add(f);
+            }
+        }
+        return out;
+    }
+
     private static Bitmap asBitmap(Object o) {
         if (o instanceof Bitmap) {
             Bitmap b = (Bitmap) o;
@@ -180,7 +212,7 @@ public final class CompositionBridge {
             return false;
         }
         boolean wrote = false;
-        for (Field f : result.getClass().getDeclaredFields()) {
+        for (Field f : allFields(result.getClass())) {
             String n = f.getName().toLowerCase(Locale.US);
             try {
                 f.setAccessible(true);

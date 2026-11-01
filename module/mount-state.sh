@@ -9,7 +9,8 @@
 #
 # Wire format: one "source<TAB>target" pair per line, newest first.
 
-MOUNT_STATE_FILE=$MODDIR/mounted-targets
+MOUNTINFO=${MOUNTINFO:-/proc/self/mountinfo}
+MOUNT_STATE_FILE=${MOUNT_STATE_FILE:-$MODDIR/mounted-targets}
 MOUNTED_TARGETS=
 
 ms_log() {
@@ -50,7 +51,7 @@ mount_state_owned() {
             if ($4 == root_a "//deleted" || $4 == root_b "//deleted") hit = 1
         }
         END { exit(hit ? 0 : 1) }
-    ' /proc/self/mountinfo
+    ' "$MOUNTINFO"
 }
 
 # Releases every recorded bind that is still ours, newest first. Leaves foreign mounts alone.
