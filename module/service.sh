@@ -101,6 +101,11 @@ restorecon -R "$APP/files/jiege"
 ASSET_DIR="$APP/files/pop_port"
 PLD_APP="$APP/files/odm/etc/camera/pld_watermark"
 set_config com.oplus.feature.retro.camera.support 1
+# POP preview needs the inverse-mask shader. GLES20Canvas builds that program only when the low bit of
+# this config integer has bit 2 set ((v & 4) == 4, ia.n0.i0), and the X8 Ultra vendor tag list has no such
+# key at all, so j0 stays null and the first draw through GLES20Canvas.p0 throws inside
+# CameraPreviewUI.Ug -> NPE on the PreviewGLThread. The X9 Ultra value is 111; anything with bit 2 works.
+set_config com.oplus.feature.colorful.screen.torch.config 111
 # Flash brightness slider (柔和/反差); the camera drives it through com.oplus.flash.IntensityControl.
 set_config com.oplus.flashlevel.configurable.support 1
 set_config com.oplus.feature.tilt.shift.photo.support 1

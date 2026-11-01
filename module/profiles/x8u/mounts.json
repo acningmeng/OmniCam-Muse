@@ -572,6 +572,11 @@
       "consumer": "com.oplus.camera shared_prefs"
     },
     {
+      "key": "com.oplus.feature.colorful.screen.torch.config",
+      "value": "111",
+      "consumer": "com.oplus.camera shared_prefs"
+    },
+    {
       "key": "com.oplus.flashlevel.configurable.support",
       "value": "1",
       "consumer": "com.oplus.camera shared_prefs"
