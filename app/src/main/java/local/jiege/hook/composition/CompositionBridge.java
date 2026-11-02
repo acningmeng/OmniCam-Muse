@@ -146,10 +146,10 @@ public final class CompositionBridge {
         if (frame == null) {
             return;
         }
-        sLastRun = now;
         if (!BUSY.compareAndSet(false, true)) {
             return; // a frame is already being scored; drop this one instead of queueing it
         }
+        sLastRun = now;
 
         // Copy on the caller's thread: the camera owns this bitmap and may reuse it as soon as we return.
         int[] pixels;

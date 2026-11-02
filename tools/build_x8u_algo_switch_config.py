@@ -31,53 +31,17 @@ from __future__ import annotations
 
 import argparse
 import json
-import re
 from pathlib import Path
 
 import oplus_config
 
 KEY = bytes.fromhex("6f2170406c247525535e4326412a4d28")
-ENVELOPE_HEAD = 4
-ENVELOPE_TAIL = 4
 MODE = "retroCamera"
 SECTIONS = ("aps_capture_configs", "aps_preview_configs")
 
 
 def decode_stock(raw: bytes) -> str:
     return oplus_config.decode(raw, KEY)
-
-
-def strip_comments(text: str) -> str:
-    out: list[str] = []
-    index, size, in_string, escaped = 0, len(text), False, False
-    while index < size:
-        char = text[index]
-        if in_string:
-            out.append(char)
-            if escaped:
-                escaped = False
-            elif char == "\\":
-                escaped = True
-            elif char == '"':
-                in_string = False
-            index += 1
-            continue
-        if char == '"':
-            in_string = True
-            out.append(char)
-            index += 1
-            continue
-        if char == "/" and index + 1 < size and text[index + 1] == "/":
-            while index < size and text[index] not in "\r\n":
-                index += 1
-            continue
-        out.append(char)
-        index += 1
-    return "".join(out)
-
-
-def load(text: str) -> dict:
-    return json.loads(re.sub(r",(\s*[}\]])", r"\1", strip_comments(text)))
 
 
 def blocks(table: dict, section: str) -> dict:
@@ -106,7 +70,7 @@ def main() -> int:
 
     stock_text = decode_stock(args.stock.read_bytes())
     reference_text = decode_stock(args.reference.read_bytes())
-    stock, reference = load(stock_text), load(reference_text)
+    stock, reference = oplus_config.loads(stock_text), oplus_config.loads(reference_text)
 
     before = {section: [item.get("mode") for item in stock.get(section, [])] for section in SECTIONS}
     for section in SECTIONS:

@@ -92,8 +92,8 @@ def write(path: Path, text: str, key: bytes = DEFAULT_KEY, envelope: bool = Fals
 
 # ---------------------------------------------------------------- JSON with OPPO's quirks
 
-def strip_comments(text: str) -> str:
-    """Drop // line comments while respecting string literals."""
+def clean_json(text: str) -> str:
+    """Drop // comments and trailing commas while respecting string literals."""
     out: list[str] = []
     index, size, in_string, escaped = 0, len(text), False, False
     while index < size:
@@ -114,23 +114,36 @@ def strip_comments(text: str) -> str:
             index += 1
             continue
         if char == "/" and index + 1 < size and text[index + 1] == "/":
-            while index < size and text[index] != "\n":
+            while index < size and text[index] not in "\r\n":
                 index += 1
             continue
+        if char == ",":
+            # Skip the comma if it is followed only by whitespace and then } or ].
+            j = index + 1
+            while j < size and text[j] in " \t\r\n":
+                j += 1
+            if j < size and text[j] in "}]":
+                index = j
+                continue
         out.append(char)
         index += 1
     return "".join(out)
 
 
+def strip_comments(text: str) -> str:
+    """Drop // line comments while respecting string literals."""
+    return clean_json(text)
+
+
 def drop_trailing_commas(text: str) -> str:
-    import re
-    return re.sub(r",(\s*[}\]])", r"\1", text)
+    """Drop trailing commas while respecting string literals."""
+    return clean_json(text)
 
 
 def loads(text: str):
     """Parse OPPO's JSON dialect: // comments and trailing commas."""
     import json
-    return json.loads(drop_trailing_commas(strip_comments(text)))
+    return json.loads(clean_json(text))
 
 
 def dumps(value) -> str:
