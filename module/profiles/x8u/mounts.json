@@ -119,12 +119,13 @@
       ],
       "kind": "bind-file",
       "sources": [
-        "payload/audio_policy_volumes.xml"
+        "payload/x8u/audio_policy_volumes.xml"
       ],
       "target": "/odm/etc/audio/audio_policy_volumes.xml",
-      "gate": null,
+      "gate": "profile:x8u",
       "selinux": "vendor_configs_file",
       "policy": "skip-if-missing",
+      "verdict": "rebased:x8u-stock-plus-enforced-curve",
       "expected": "ready"
     },
     {
@@ -173,7 +174,7 @@
         "payload/gamma/gamma_preview_sdr_conf.json"
       ],
       "target": "/odm/etc/camera/gamma_preview_sdr_conf.json",
-      "gate": null,
+      "gate": "profile:x9u",
       "selinux": "vendor_configs_file",
       "policy": "skip-if-missing",
       "expected": "ready"
@@ -188,7 +189,7 @@
         "payload/gamma/gamma_quick_sdr_conf.json"
       ],
       "target": "/odm/etc/camera/gamma_quick_sdr_conf.json",
-      "gate": null,
+      "gate": "profile:x9u",
       "selinux": "vendor_configs_file",
       "policy": "skip-if-missing",
       "expected": "ready"
@@ -203,7 +204,7 @@
         "payload/gamma/gamma_preview_hdr_conf.json"
       ],
       "target": "/odm/etc/camera/gamma_preview_hdr_conf.json",
-      "gate": null,
+      "gate": "profile:x9u",
       "selinux": "vendor_configs_file",
       "policy": "skip-if-missing",
       "expected": "ready"
@@ -220,7 +221,7 @@
         "payload/isp/com.qti.tuned.lighthousemain.bin"
       ],
       "target": "/odm/lib64/camera/com.qti.tuned.lighthousemain.bin",
-      "gate": null,
+      "gate": "target-exists",
       "selinux": "vendor_file",
       "policy": "skip-if-missing",
       "expected": "skipped:target-missing"
@@ -237,7 +238,7 @@
         "payload/isp/com.qti.tuned.lighthousewide.bin"
       ],
       "target": "/odm/lib64/camera/com.qti.tuned.lighthousewide.bin",
-      "gate": null,
+      "gate": "target-exists",
       "selinux": "vendor_file",
       "policy": "skip-if-missing",
       "expected": "skipped:target-missing"
@@ -254,7 +255,7 @@
         "payload/isp/com.qti.tuned.lighthousetele.bin"
       ],
       "target": "/odm/lib64/camera/com.qti.tuned.lighthousetele.bin",
-      "gate": null,
+      "gate": "target-exists",
       "selinux": "vendor_file",
       "policy": "skip-if-missing",
       "expected": "skipped:target-missing"
@@ -271,7 +272,7 @@
         "payload/isp/com.qti.tuned.lighthouseultratele.bin"
       ],
       "target": "/odm/lib64/camera/com.qti.tuned.lighthouseultratele.bin",
-      "gate": null,
+      "gate": "target-exists",
       "selinux": "vendor_file",
       "policy": "skip-if-missing",
       "expected": "skipped:target-missing"

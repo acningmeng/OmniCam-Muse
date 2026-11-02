@@ -2830,6 +2830,11 @@
       "path": "payload/x10_basictone/setting/SimTool_Preview_Palette_Normal.ini",
       "bytes": 121,
       "sha256": "bdd2965393a3438961a72d1376cef0ff4fe3f42a1c60b4daa64d27ab820d2306"
+    },
+    {
+      "path": "payload/x8u/audio_policy_volumes.xml",
+      "bytes": 30235,
+      "sha256": "0e941f47d92757f6e990e2e7f18d2798c27ab8f45d2c2d89b418d66197825379"
     }
   ]
 }

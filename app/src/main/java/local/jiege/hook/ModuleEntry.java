@@ -103,7 +103,13 @@ public final class ModuleEntry implements IXposedHookLoadPackage, IXposedHookZyg
             }
             // LSPosed calls native_init when this library is loaded; it must be registered before
             // the camera loads libAlgoInterface / libBasicTone*, so it goes before the features.
-            System.loadLibrary("jiege_native");
+            // A load failure (ABI mismatch, missing dependency) must not take the Java features down:
+            // they run without the native half, so guard it and keep installing.
+            try {
+                System.loadLibrary("jiege_native");
+            } catch (Throwable error) {
+                Log.e("ModuleEntry", "native library unavailable, native features stay off", error);
+            }
             CaptureDumps.installCamera();
             Symbols.install("camera", classLoader, param.appInfo.sourceDir, param.appInfo.dataDir);
             PopPort.installCamera(classLoader, CAMERA.equals(param.processName));

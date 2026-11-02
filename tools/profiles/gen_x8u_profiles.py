@@ -244,9 +244,11 @@ def entries(tree: dict[str, int]) -> list[dict]:
                      "verdict": verdict, "selinux": "vendor_configs_file",
                      "policy": "skip-if-missing", "expected": expected})
     rows.append({"id": "audio-volumes", "featureIds": ["UI-07"], "kind": "bind-file",
-                 "sources": ["payload/audio_policy_volumes.xml"],
-                 "target": "/odm/etc/audio/audio_policy_volumes.xml", "gate": None,
+                 "sources": ["payload/x8u/audio_policy_volumes.xml"],
+                 "target": "/odm/etc/audio/audio_policy_volumes.xml",
+                 "gate": "profile:x8u",
                  "selinux": "vendor_configs_file", "policy": "skip-if-missing",
+                 "verdict": "rebased:x8u-stock-plus-enforced-curve",
                  "expected": ("ready" if "/odm/etc/audio/audio_policy_volumes.xml" in tree
                               else "skipped:target-missing")})
     for ident, features, live, overlays in [
@@ -262,15 +264,16 @@ def entries(tree: dict[str, int]) -> list[dict]:
     for name in GAMMA_NAMES:
         target = "/odm/etc/camera/%s" % name
         rows.append({"id": name, "featureIds": ["MD-02"], "kind": "bind-file",
-                     "sources": ["payload/gamma/%s" % name], "target": target, "gate": None,
+                     "sources": ["payload/gamma/%s" % name], "target": target,
+                     "gate": "profile:x9u",
                      "selinux": "vendor_configs_file", "policy": "skip-if-missing",
-                     "expected": "ready" if target in tree else "skipped:target-missing"})
+                     "expected": ("ready" if target in tree else "skipped:target-missing")})
     for lens in ISP_LENSES:
         name = "com.qti.tuned.lighthouse%s.bin" % lens
         target = "/odm/lib64/camera/%s" % name
         rows.append({"id": "isp-%s" % lens, "featureIds": ["MD-02", "MD-03", "MC-01"],
                      "kind": "bind-file", "sources": ["payload/isp/%s" % name], "target": target,
-                     "gate": None, "selinux": "vendor_file", "policy": "skip-if-missing",
+                     "gate": "target-exists", "selinux": "vendor_file", "policy": "skip-if-missing",
                      "expected": "ready" if target in tree else "skipped:target-missing"})
     return rows
 
@@ -429,7 +432,8 @@ def resources_doc() -> tuple[dict, list[str]]:
                 ("basictone-x10", "payload/x10_basictone", ["MD-04", "MC-02"]),
                 ("basictone-retro", "payload/setting_Retro", ["MD-04"]),
                 ("gamma", "payload/gamma", ["MD-02"]),
-                ("isp", "payload/isp", ["MD-02", "MD-03"])]
+                ("isp", "payload/isp", ["MD-02", "MD-03"]),
+                ("audio-x8u", "payload/x8u", ["UI-07"])]
     lines, groups = [], []
     for ident, rel, features in sections:
         root = MODULE / rel

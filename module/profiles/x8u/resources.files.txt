@@ -84,3 +84,4 @@ payload/isp/com.qti.tuned.lighthousemain.bin 12110402 a0e8b4650853180e8935599028
 payload/isp/com.qti.tuned.lighthousetele.bin 13280958 5d591c49c0556e88dc4122d3015a0e8bf71d6b8ec7c26879ad2ab397c0c7c1f8
 payload/isp/com.qti.tuned.lighthouseultratele.bin 18210470 afcec3e050f8b302f94ac7031454efe945832e2591538e36820f20b24eed15f7
 payload/isp/com.qti.tuned.lighthousewide.bin 11532751 01c1b01eb93b82e8ae4eddcd6b38c3d60a41c89c612f7814f4ea2718f9a6fb6e
+payload/x8u/audio_policy_volumes.xml 30235 0e941f47d92757f6e990e2e7f18d2798c27ab8f45d2c2d89b418d66197825379

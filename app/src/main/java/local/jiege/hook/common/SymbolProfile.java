@@ -59,7 +59,15 @@ public final class SymbolProfile {
             String chosenId = "default";
             String module = Symbols.modulePath();
             if (module != null) {
+                String actualVersion = cameraVersion();
                 try (ZipFile apk = new ZipFile(module)) {
+                    // Collect every match and rank them: taking the first zip entry would make the
+                    // result depend on entry order, and a second profile for the same model would
+                    // silently change which one wins.
+                    JSONObject best = null;
+                    String bestDir = null;
+                    String bestId = null;
+                    int bestScore = -1;
                     Enumeration<? extends ZipEntry> entries = apk.entries();
                     while (entries.hasMoreElements()) {
                         ZipEntry entry = entries.nextElement();
@@ -69,11 +77,21 @@ public final class SymbolProfile {
                         try (InputStream in = apk.getInputStream(entry)) {
                             meta = new JSONObject(new String(readAll(in), "UTF-8"));
                         }
-                        if (!matches(meta)) continue;
+                        if (!modelMatches(meta)) continue;
+                        int score = score(meta, actualVersion);
+                        if (score < 0) continue;   // keyed to a different camera build: reject
                         String dir = name.substring(0, name.length() - META.length());
-                        chosen = dir + meta.optString("symbols", "symbols.json");
-                        chosenId = meta.optString("profileId", dir.substring(DIR.length()));
-                        break;
+                        String id = meta.optString("profileId", dir.substring(DIR.length()));
+                        if (score > bestScore || (score == bestScore && id.compareTo(bestId) < 0)) {
+                            best = meta;
+                            bestDir = dir;
+                            bestId = id;
+                            bestScore = score;
+                        }
+                    }
+                    if (best != null) {
+                        chosen = bestDir + best.optString("symbols", "symbols.json");
+                        chosenId = bestId;
                     }
                 } catch (Throwable error) {
                     Log.i(TAG, "profile lookup failed, using the base spec: " + error);
@@ -85,23 +103,28 @@ public final class SymbolProfile {
         }
     }
 
-    private static boolean matches(JSONObject meta) {
+    /** A model match is required before anything else. */
+    private static boolean modelMatches(JSONObject meta) {
         JSONArray models = meta.optJSONArray("models");
-        boolean model = false;
         String device = Build.MODEL == null ? "" : Build.MODEL;
-        if (models != null) {
-            for (int i = 0; i < models.length() && !model; i++) {
-                model = device.equalsIgnoreCase(models.optString(i, ""));
-            }
+        if (models == null) return false;
+        for (int i = 0; i < models.length(); i++) {
+            if (device.equalsIgnoreCase(models.optString(i, ""))) return true;
         }
-        if (!model) return false;
+        return false;
+    }
+
+    /**
+     * 2 = the camera build this profile was verified against; 1 = keyed to a version that cannot be
+     * read here (accepted, because no profile is a guaranteed miss on every ported symbol);
+     * 0 = model-only profile; -1 = keyed to a different build than the installed one, rejected: the
+     * obfuscated names drift between builds and a wrong member throws at hook time.
+     */
+    private static int score(JSONObject meta, String actualVersion) {
         String version = meta.optString("cameraVersion", "");
-        if (version.isEmpty()) return true;
-        String actual = cameraVersion();
-        // A profile keyed to a camera build must not be applied to another one: the obfuscated
-        // names drift between builds. If the version cannot be read we still accept the model
-        // match, because the alternative (no profile) is a guaranteed miss on every ported symbol.
-        return actual.isEmpty() || actual.equals(version);
+        if (version.isEmpty()) return 0;
+        if (actualVersion.isEmpty()) return 1;
+        return actualVersion.equals(version) ? 2 : -1;
     }
 
     private static String cameraVersion() {
@@ -129,7 +152,7 @@ public final class SymbolProfile {
         try (InputStream input = in) {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             byte[] buffer = new byte[4096];
-            for (int n; (n = input.read(buffer)) > 0; ) out.write(buffer, 0, n);
+            for (int n; (n = input.read(buffer)) >= 0; ) out.write(buffer, 0, n);
             return out.toByteArray();
         }
     }

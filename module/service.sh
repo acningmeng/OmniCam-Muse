@@ -9,9 +9,17 @@ OUT=$APP/files/ricoh_gr/lmt
 GR_AVAILABLE='0.6(14),1(23),2(47),3(70),6(139),10(230)'
 GR_MARKED='1.2173913(28),1.7391304(40)'
 
-until [ -d "$APP" ]; do
+# Bounded wait: a device without this package would otherwise hang the service (and everything
+# after it, including the gallery staging) forever.
+WAIT=0
+until [ -d "$APP" ] || [ "$WAIT" -ge 120 ]; do
     sleep 1
+    WAIT=$((WAIT + 1))
 done
+if [ ! -d "$APP" ]; then
+    echo "$(date '+%m-%d %H:%M:%S') camera data dir $APP never appeared; camera staging skipped" >> "$LOG"
+    exit 1
+fi
 
 # Report the camera build here rather than in post-fs-data: this script runs as a late_start service,
 # so the package manager answers immediately instead of blocking the boot.
@@ -32,11 +40,29 @@ fi
 set_config() {
     KEY=$1
     VALUE=$2
-    if grep -q "name=\"$KEY\"" "$PREF_FILE"; then
-        sed -i "s#<string name=\"$KEY\">[^<]*</string>#<string name=\"$KEY\">$VALUE</string>#" "$PREF_FILE"
-    else
-        sed -i "/<\/map>/i\    <string name=\"$KEY\">$VALUE</string>" "$PREF_FILE"
-    fi
+    TMP="$PREF_FILE.tmp"
+    # awk keeps the key and the value literal strings (ENVIRON is not escape-processed): sed would
+    # treat & and the delimiter as metacharacters and could emit invalid XML for a future value
+    # containing them. A failed edit leaves the file untouched.
+    KEY="$KEY" VALUE="$VALUE" awk '
+        BEGIN {
+            key = ENVIRON["KEY"]; value = ENVIRON["VALUE"]
+            entry = "    <string name=\"" key "\">" value "</string>"; written = 0
+        }
+        {
+            if (match($0, /<string name="[^"]*"/) && substr($0, RSTART + 14, RLENGTH - 15) == key) {
+                print entry
+                written = 1
+                next
+            }
+            if (!written && index($0, "</map>") > 0) {
+                print entry
+                written = 1
+            }
+            print
+        }
+        END { if (!written) exit 3 }
+    ' "$PREF_FILE" > "$TMP" && mv "$TMP" "$PREF_FILE" || rm -f "$TMP"
 }
 
     set_config com.oplus.gr.mode.support 1
@@ -157,9 +183,17 @@ find "$FACE_DIR" -type f -exec chmod 0644 {} \;
 restorecon -R "$FACE_DIR" 2>/dev/null || true
 
 GALLERY=/data/user/0/com.coloros.gallery3d
-until [ -d "$GALLERY" ]; do
+# Bounded wait: without the gallery package (or before it is first created) the staging below
+# would otherwise never run.
+WAIT=0
+until [ -d "$GALLERY" ] || [ "$WAIT" -ge 120 ]; do
     sleep 1
+    WAIT=$((WAIT + 1))
 done
+if [ ! -d "$GALLERY" ]; then
+    echo "$(date '+%m-%d %H:%M:%S') gallery data dir never appeared; gallery staging skipped" >> "$LOG"
+    GALLERY_UID=
+else
 GALLERY_UID=$(stat -c %u "$GALLERY")
 GALLERY_PREF="$GALLERY/shared_prefs/business_featureSwitch_config.xml"
 WAIT=0
@@ -183,6 +217,22 @@ cp "$MODDIR/payload/watermark_master_styles/"*.json "$STYLE_OUT/"
 if [ -d "$MODDIR/payload/watermark_drawables" ]; then
     cp "$MODDIR/payload/watermark_drawables/"*.webp "$STYLE_OUT/" 2>/dev/null || true
 fi
+chown -R "$GALLERY_UID:$GALLERY_UID" "$STYLE_OUT"
+chmod 0644 "$STYLE_OUT"/*
+restorecon -R "$STYLE_OUT"
+# Camera unit SDK with the palette classes (CombineLut, PaletteColorTable) for the gallery's
+# palette editor; the gallery hook loads it in place of the system copy. Dex must be read-only.
+IPU_OUT="$GALLERY/files/jiege_ipu"
+mkdir -p "$IPU_OUT"
+cmp -s "$MODDIR/payload/ipu/com.oplus.camera.unit.sdk.jar" "$IPU_OUT/com.oplus.camera.unit.sdk.jar" || cp -f "$MODDIR/payload/ipu/com.oplus.camera.unit.sdk.jar" "$IPU_OUT/"
+chown "$GALLERY_UID:$GALLERY_UID" "$IPU_OUT"
+chmod 0711 "$IPU_OUT"
+chown 0:0 "$IPU_OUT/com.oplus.camera.unit.sdk.jar"
+chmod 0444 "$IPU_OUT/com.oplus.camera.unit.sdk.jar"
+restorecon "$IPU_OUT"
+# A root-owned file gets no MLS categories from restorecon; take the directory's.
+chcon "$(ls -dZ "$IPU_OUT" | awk '{print $1}')" "$IPU_OUT/com.oplus.camera.unit.sdk.jar"
+fi
 CAM_ML="$APP/files/mode_limit_watermark"
 mkdir -p "$CAM_ML"
 for i in 1 2 3 4 5; do
@@ -201,21 +251,6 @@ done
 if [ -d "$MODDIR/payload/watermark_drawables" ]; then
     cp -f "$MODDIR/payload/watermark_drawables/"*.webp "$CAM_ML/" 2>/dev/null || true
 fi
-chown -R "$GALLERY_UID:$GALLERY_UID" "$STYLE_OUT"
-chmod 0644 "$STYLE_OUT"/*
-restorecon -R "$STYLE_OUT"
-# Camera unit SDK with the palette classes (CombineLut, PaletteColorTable) for the gallery's
-# palette editor; the gallery hook loads it in place of the system copy. Dex must be read-only.
-IPU_OUT="$GALLERY/files/jiege_ipu"
-mkdir -p "$IPU_OUT"
-cmp -s "$MODDIR/payload/ipu/com.oplus.camera.unit.sdk.jar" "$IPU_OUT/com.oplus.camera.unit.sdk.jar" || cp -f "$MODDIR/payload/ipu/com.oplus.camera.unit.sdk.jar" "$IPU_OUT/"
-chown "$GALLERY_UID:$GALLERY_UID" "$IPU_OUT"
-chmod 0711 "$IPU_OUT"
-chown 0:0 "$IPU_OUT/com.oplus.camera.unit.sdk.jar"
-chmod 0444 "$IPU_OUT/com.oplus.camera.unit.sdk.jar"
-restorecon "$IPU_OUT"
-# A root-owned file gets no MLS categories from restorecon; take the directory's.
-chcon "$(ls -dZ "$IPU_OUT" | awk '{print $1}')" "$IPU_OUT/com.oplus.camera.unit.sdk.jar"
 chown -R "$APP_UID:$APP_UID" "$CAM_ML"
 find "$CAM_ML" -type f -exec chmod 0644 {} \;
 find "$CAM_ML" -type d -exec chmod 0755 {} \;

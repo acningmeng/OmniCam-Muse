@@ -149,22 +149,24 @@ public final class MasterColor {
         int[] values = new int[parameters.length];
         for (int i = 0; i < values.length; ++i)
             values[i] = Math.max(parameters[i].min, Math.min(parameters[i].max, Settings.getInt(parameters[i].key)));
-        if (id.equals(look) && ev == exposureEv && tone == tonePercent && colour == colourPercent
-            && Arrays.equals(density, densityPercent) && Arrays.equals(values, paramValues)) return;
-        try {
-            File tmp = new File(ROOT, "look.tmp");
-            try (FileOutputStream out = new FileOutputStream(tmp)) {
-                // Line 1 look, line 2 exposure compensation in EV, lines 3 and 4 the blend weights, line 5 CMY density, all in percent,
-                // line 6 the look parameters, four numbers in display units, "nan" = the look's default (master_color.cpp masterColorLook).
-                out.write((id + "\n" + String.format(Locale.ROOT, "%.2f", ev) + "\n" + tone + "\n" + colour + "\n" + density[0] + " " + density[1] + " " + density[2]
-                    + "\n" + parameterText(parameters, values))
-                    .getBytes(StandardCharsets.US_ASCII));
-            }
-            if (!tmp.renameTo(new File(ROOT, "look"))) Log.i(TAG, "look file rename failed");
-        } catch (Throwable error) {
-            Log.e(TAG, "look file", error);
-        }
         synchronized (MasterColor.class) {
+            // Re-check under the lock: syncSetting is called from both the preview thread (Lut3d.load)
+            // and the result thread (TotalCaptureResult), and two writers would interleave in look.tmp.
+            if (id.equals(look) && ev == exposureEv && tone == tonePercent && colour == colourPercent
+                && Arrays.equals(density, densityPercent) && Arrays.equals(values, paramValues)) return;
+            try {
+                File tmp = new File(ROOT, "look.tmp");
+                try (FileOutputStream out = new FileOutputStream(tmp)) {
+                    // Line 1 look, line 2 exposure compensation in EV, lines 3 and 4 the blend weights, line 5 CMY density, all in percent,
+                    // line 6 the look parameters, four numbers in display units, "nan" = the look's default (master_color.cpp masterColorLook).
+                    out.write((id + "\n" + String.format(Locale.ROOT, "%.2f", ev) + "\n" + tone + "\n" + colour + "\n" + density[0] + " " + density[1] + " " + density[2]
+                        + "\n" + parameterText(parameters, values))
+                        .getBytes(StandardCharsets.US_ASCII));
+                }
+                if (!tmp.renameTo(new File(ROOT, "look"))) Log.i(TAG, "look file rename failed");
+            } catch (Throwable error) {
+                Log.e(TAG, "look file", error);
+            }
             look = id;
             exposureEv = ev;
             tonePercent = tone;
@@ -263,7 +265,6 @@ public final class MasterColor {
             if (dir == null) { clearPreview("preview: key write failed"); return; }
             // The native path hooks bake a table on the first read of its LMTLut0, here and not on a camera thread.
             if (superseded()) return;   // a newer table is already asked for: bake that one
-            new File(dir, "LMTLut0").exists();
             synchronized (MasterColor.class) {
                 if (request.generation != generation) return;
                 previewDir = dir;
@@ -273,7 +274,10 @@ public final class MasterColor {
         reload(dir);
     }
 
-    /** Re-runs the manager's load for the master mode so a new table reaches the preview. */
+    /** Re-runs the manager's load for the master mode so a new table reaches the preview.
+     * Runs on the worker thread: Lut3d.load proved thread-safe under concurrent preview loads on the
+     * tested builds, which is an assumption, not a guarantee; a future build that is not would show up
+     * as a crash in this call stack rather than in the camera's own. */
     private static void reload(String dir) throws Throwable {
         final Object lut = manager;
         final Object[] args = lastLoadArgs;

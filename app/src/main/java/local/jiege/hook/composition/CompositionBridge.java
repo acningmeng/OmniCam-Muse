@@ -26,9 +26,9 @@ import de.robv.android.xposed.XposedHelpers;
  * helper exposes.
  *
  * <p>Everything is fail-open: if the helper class, the frame field or the result setter is missing on a
- * future build, we log one line and leave the stock behaviour untouched. The gate is the module marker
- * file {@code enable_composition}, read once per process, so the phone can switch it off without a
- * rebuild.
+ * future build, we log one line and leave the stock behaviour untouched. The gate is the
+ * {@code ai_composition} module setting (the 灵感构图 switch on the settings page), read at install
+ * time, so the phone can switch it off without a rebuild.
  */
 public final class CompositionBridge {
 

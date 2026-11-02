@@ -60,6 +60,17 @@
       "bytes": 55134581,
       "aggregateSha256": "15d16f642c2dff20db1284679392669b23252babb255826654d45222af374a3a",
       "licenseId": "device-capture"
+    },
+    {
+      "id": "audio-x8u",
+      "path": "payload/x8u",
+      "featureIds": [
+        "UI-07"
+      ],
+      "files": 1,
+      "bytes": 30235,
+      "aggregateSha256": "0a7b1226be5d37833f40ec141ac849eb6d697cbcc1df1c67452a8424f2e2b9b4",
+      "licenseId": "device-capture"
     }
   ],
   "assets": [
@@ -80,5 +91,5 @@
     }
   ],
   "inventory": "resources.files.txt",
-  "inventorySha256": "15d16f642c2dff20db1284679392669b23252babb255826654d45222af374a3a"
+  "inventorySha256": "0a7b1226be5d37833f40ec141ac849eb6d697cbcc1df1c67452a8424f2e2b9b4"
 }

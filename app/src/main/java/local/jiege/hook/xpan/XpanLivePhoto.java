@@ -86,6 +86,7 @@ public final class XpanLivePhoto {
     private static final Set<String> IN_PROGRESS = ConcurrentHashMap.newKeySet();
     private static final ScheduledExecutorService WORKER = Executors.newSingleThreadScheduledExecutor(r -> {
         Thread thread = new Thread(r, "XpanLive");
+        thread.setDaemon(true);
         thread.setPriority(Thread.NORM_PRIORITY - 1);
         return thread;
     });
@@ -432,7 +433,7 @@ public final class XpanLivePhoto {
                 pos += 4;
             }
             pos += 16;
-            return pos + 16 <= params.length ? pos : -1;
+            return pos >= 0 && pos + 16 <= params.length ? pos : -1;
         } catch (IndexOutOfBoundsException malformed) {
             return -1;
         }

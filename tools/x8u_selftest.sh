@@ -18,12 +18,10 @@ ok()   { echo "  [ok]   $1"; }
 warn() { echo "  [warn] $1"; }
 bad()  { echo "  [FAIL] $1"; FAIL=1; }
 
-cfg() { echo "$1"; }
-
 profile() {
     MODEL=$(getprop ro.product.model)
     FW=$(getprop ro.build.display.id)
-    CAM=$(dumpsys package com.oplus.camera 2>/dev/null | grep -m1 versionName | tr -d ' ')
+    CAM=$(timeout 2 dumpsys package com.oplus.camera 2>/dev/null | grep -m1 versionName | tr -d ' ')
     case "$MODEL" in
         PKU110|PKJ110) P=x8u ;;
         PMA110)        P=x9u ;;
@@ -31,7 +29,7 @@ profile() {
     esac
     say "device: model=$MODEL profile=$P firmware=$FW $CAM"
     [ "$P" = "unknown" ] && bad "unknown model, config layers must stay off"
-    for m in enable_config_binds enable_algo_switch enable_occ_extras enable_legacy_configs enable_composition; do
+    for m in enable_config_binds enable_algo_switch enable_occ_extras enable_legacy_configs; do
         [ -f "$MODDIR/$m" ] && say "  marker: $m"
     done
     return 0

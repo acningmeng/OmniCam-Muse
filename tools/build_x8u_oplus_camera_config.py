@@ -31,8 +31,6 @@ from pathlib import Path
 import oplus_config
 
 KEY = bytes.fromhex("6f2170406c247525535e4326412a4d28")
-ENVELOPE_HEAD = 4
-ENVELOPE_TAIL = 4
 WANTED = [
     "com.oplus.feature.retro.camera.support",
     "com.oplus.feature.retro.camera.livephoto.output.size",

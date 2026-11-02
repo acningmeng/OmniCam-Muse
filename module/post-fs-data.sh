@@ -115,7 +115,20 @@ elif [ -f "$MODDIR/enable_legacy_configs" ]; then
     log "legacy marker present but skipped (profile=$MUSE_PROFILE config_binds=$MUSE_CONFIG_BINDS)"
 fi
 # Forced shutter sound stream at the system volume curve (see tools/patch_audio_volumes.py).
-bind_file "$MODDIR/payload/audio_policy_volumes.xml" /odm/etc/audio/audio_policy_volumes.xml
+# The payload copy is per profile: the X9U-derived table is not a valid substitute for another
+# device's stock audio policy, so an unknown profile binds nothing.
+case "$MUSE_PROFILE" in
+    x9u) AUDIO_SOURCE="$MODDIR/payload/audio_policy_volumes.xml" ;;
+    x8u) AUDIO_SOURCE="$MODDIR/payload/x8u/audio_policy_volumes.xml" ;;
+    *)   AUDIO_SOURCE="" ;;
+esac
+if [ -n "$AUDIO_SOURCE" ] && [ -f "$AUDIO_SOURCE" ]; then
+    bind_file "$AUDIO_SOURCE" /odm/etc/audio/audio_policy_volumes.xml
+elif [ -n "$AUDIO_SOURCE" ]; then
+    log "audio volumes bind FAIL: $AUDIO_SOURCE missing"
+else
+    log "audio volumes bind skipped (unknown device)"
+fi
 
 bind_merged_dir /odm/etc/camera/meishe_lut "$MODDIR/payload/meishe_lut" "$MODDIR/merged/meishe_lut" /odm/etc/camera/meishe_lut
 
@@ -137,6 +150,9 @@ for LENS in main wide tele ultratele; do
     NAME="com.qti.tuned.lighthouse${LENS}.bin"
     SOURCE="$MODDIR/payload/isp/$NAME"
     TARGET="/odm/lib64/camera/$NAME"
+    # X8U has no lighthouse targets (mounts.json: target-missing); a bind onto a missing path
+    # only produces a FAIL line every boot, so check first.
+    [ -f "$TARGET" ] || continue
     chown root:root "$SOURCE"
     chmod 0644 "$SOURCE"
     chcon u:object_r:vendor_file:s0 "$SOURCE" 2>>"$LOG" || true
@@ -147,17 +163,25 @@ for LENS in main wide tele ultratele; do
         log "isp bind FAIL $TARGET"
     fi
 done
-for NAME in gamma_preview_sdr_conf.json gamma_quick_sdr_conf.json gamma_preview_hdr_conf.json; do
-    bind_file "$MODDIR/payload/gamma/$NAME" "/odm/etc/camera/$NAME"
-done
+# The gamma payload is the X9 Ultra build (see mounts.json); binding it on another device is a
+# cross-device transplant of ISP tuning, so it only runs where it was verified.
+if [ "$MUSE_PROFILE" = "x9u" ]; then
+    for NAME in gamma_preview_sdr_conf.json gamma_quick_sdr_conf.json gamma_preview_hdr_conf.json; do
+        bind_file "$MODDIR/payload/gamma/$NAME" "/odm/etc/camera/$NAME"
+    done
+elif [ "${MUSE_PROFILE:-unknown}" != "unknown" ]; then
+    log "gamma binds skipped (profile=$MUSE_PROFILE: payload is X9U build)"
+fi
 # Pro video ISZ (2x main, 6x tele; O-Log2 too): stock sets the ISO gate of rows 25-40 to 0/0,
 # which DoIzoomStable() can never pass; -1 means "no ISO check", like the normal video rows.
 # Patched from the live file on every boot. Touch $MODDIR/disable_pro_video_isz to skip.
+# X9U only: the row range and the 14-column layout are the X9U table's; the X8U table
+# (9 columns, 11 rows) does not match, and the awk would silently no-op there.
 HWCFG=/odm/etc/camera/CameraHWConfiguration.config
 HWOUT=$MODDIR/merged/CameraHWConfiguration.config
 if [ -f "$MODDIR/disable_pro_video_isz" ]; then
     log "pro video isz disabled"
-elif [ -f "$HWCFG" ]; then
+elif [ -f "$HWCFG" ] && [ "$MUSE_PROFILE" = "x9u" ]; then
     mkdir -p "$MODDIR/merged"
     awk -F';' -v OFS=';' '
         /^\[/ { section = $0 }

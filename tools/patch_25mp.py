@@ -19,8 +19,6 @@ import oplus_config
 import refs
 
 PROJECT = Path(__file__).resolve().parent.parent
-from Crypto.Cipher import AES  # noqa: E402
-from Crypto.Util.Padding import unpad  # noqa: E402
 
 STOCK = refs.STOCK_ODM / "odm/etc/camera/config"
 OUTPUT = PROJECT / "module/payload"
