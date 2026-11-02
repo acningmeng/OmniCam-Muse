@@ -28,6 +28,12 @@ printf '  ok  tools/\n'
 say "offline tests"
 bash tools/offline_tests/run.sh | tail -3
 
+say "config envelope"
+"$PY" tools/offline_tests/envelope_roundtrip.py | tail -1
+
+say "symbol profiles"
+"$PY" tools/symbols/make_profile.py --check | tail -1
+
 say "payload reproducibility"
 "$PY" tools/profiles/build_x8u_payload.py --check | tail -2
 

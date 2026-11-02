@@ -64,6 +64,8 @@ def main() -> int:
     parser.add_argument("--stock", required=True, type=Path, help="the device's own oplus_camera_config")
     parser.add_argument("--reference", required=True, type=Path, help="a table that already has the tags")
     parser.add_argument("--out", required=True, type=Path)
+    parser.add_argument("--envelope", action="store_true",
+                        help="wrap the result in the 01 01 envelope instead of writing plain text")
     args = parser.parse_args()
 
     stock = records(decode(args.stock.read_bytes()))
@@ -82,7 +84,7 @@ def main() -> int:
     ordered = sorted(stock.values(), key=lambda entry: entry["VendorTag"])
     text = json.dumps(ordered, ensure_ascii=False, indent=4, sort_keys=True) + "\n"
     args.out.parent.mkdir(parents=True, exist_ok=True)
-    args.out.write_text(text, encoding="utf-8")
+    oplus_config.write(args.out, text, envelope=args.envelope)
 
     print(f"stock {len(stock) - len(added)} tags -> {len(stock)} tags, added {len(added)}")
     for tag, value in added:

@@ -23,6 +23,7 @@ SRC+=("$PROJECT/app/src/main/java/local/jiege/hook/common/Diagnostics.java")
 SRC+=("$PROJECT/app/src/main/java/local/jiege/settings/DiagnosticsContract.java")
 SRC+=("$PROJECT/app/src/main/java/local/jiege/hook/common/Settings.java")
 SRC+=("$PROJECT/app/src/main/java/local/jiege/hook/common/Symbols.java")
+SRC+=("$PROJECT/app/src/main/java/local/jiege/hook/common/SymbolProfile.java")
 SRC+=("$PROJECT/app/src/main/java/local/jiege/hook/common/SymbolSearch.java")
 
 DEXKIT=$(find "$HOME/.gradle/caches/modules-2/files-2.1/org.luckypray/dexkit" -name 'dexkit-*.aar' ! -name '*sources*' 2>/dev/null | sort -V | tail -1)

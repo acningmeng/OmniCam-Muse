@@ -22,7 +22,8 @@ import org.luckypray.dexkit.DexKitBridge;
 /**
  * Obfuscated classes and members of the hooked apps, found by fingerprint instead of by name.
  *
- * The fingerprints are in assets/symbols.json (one section per app). Each symbol says what it
+ * The fingerprints are in assets/symbols.json (one section per app), or in a per-device override
+ * under assets/profiles/<id>/ when SymbolProfile matches this build. Each symbol says what it
  * must be: strings its code uses, framework APIs it calls, its signature, and its relation to
  * other symbols (caller, override, declaring or field type). SymbolSearch finds them with DexKit;
  * the same search is replayed offline against known app builds. A symbol that does not match
@@ -33,7 +34,6 @@ import org.luckypray.dexkit.DexKitBridge;
  */
 public final class Symbols {
     private static final String TAG = "Symbols";
-    private static final String SPEC = "assets/symbols.json";
     private static final int CACHE_VERSION = 2;
 
     private static volatile Symbols current;
@@ -71,7 +71,8 @@ public final class Symbols {
         long start = System.currentTimeMillis();
         String how = "error";
         try {
-            JSONObject spec = new JSONObject(readSpec()).getJSONObject(section);
+            String specPath = SymbolProfile.spec();
+            JSONObject spec = new JSONObject(readSpec(specPath)).getJSONObject(section);
             File apk = new File(apkPath);
             String key = CACHE_VERSION + "|" + sha1(spec.toString()) + "|" + apk.getAbsolutePath() + "|" + apk.length() + "|" + apk.lastModified();
             File cache = new File(dataDir, "cache/jiege_symbols_" + section + ".json");
@@ -267,14 +268,14 @@ public final class Symbols {
         }
     }
 
-    private static String readSpec() throws Exception {
-        InputStream in = Symbols.class.getClassLoader().getResourceAsStream(SPEC);
+    private static String readSpec(String assetPath) throws Exception {
+        InputStream in = Symbols.class.getClassLoader().getResourceAsStream(assetPath);
         if (in != null) return new String(readAll(in), "UTF-8");
         String path = modulePath;
-        if (path == null) throw new IllegalStateException(SPEC + " not readable (no module path)");
+        if (path == null) throw new IllegalStateException(assetPath + " not readable (no module path)");
         try (java.util.zip.ZipFile apk = new java.util.zip.ZipFile(path)) {
-            java.util.zip.ZipEntry entry = apk.getEntry(SPEC);
-            if (entry == null) throw new IllegalStateException(SPEC + " missing from " + path);
+            java.util.zip.ZipEntry entry = apk.getEntry(assetPath);
+            if (entry == null) throw new IllegalStateException(assetPath + " missing from " + path);
             return new String(readAll(apk.getInputStream(entry)), "UTF-8");
         }
     }

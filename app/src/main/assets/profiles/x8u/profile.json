@@ -1,0 +1,14 @@
+{
+ "profileId": "pku110-17.0.0.104-camera-7.006.123",
+ "models": [
+  "PKU110",
+  "PKJ110"
+ ],
+ "cameraVersion": "7.006.123",
+ "note": "Find X8 Ultra (PKU110/PKJ110), OplusCamera 7.006.123",
+ "symbols": "symbols.json",
+ "sections": [
+  "camera",
+  "gallery"
+ ]
+}

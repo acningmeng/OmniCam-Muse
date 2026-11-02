@@ -81,8 +81,23 @@ mounts() {
 
 shoot() {
     MODE=${1:-photo}
+    case "$MODE" in
+        photo) WANT=common ;;
+        pop)   WANT=retroCamera ;;
+        gr)    WANT=gr ;;
+        *)     bad "unknown mode $MODE (photo|pop|gr)"; return 0 ;;
+    esac
+    # The camera restores the last mode on start, so a tap aimed at the photo shutter can land on the
+    # POP layout and look like "the shutter is broken". Fail before tapping instead of reporting a
+    # capture failure that is really a mode mismatch.
+    ACTUAL=$(logcat -d -b main 2>/dev/null | grep "setCurrentMode, mode:" | tail -1 | sed 's/.*mode: //')
+    if [ -n "$ACTUAL" ] && [ "$ACTUAL" != "$WANT" ]; then
+        bad "mode is $ACTUAL, expected $WANT -- switch the camera to $MODE and rerun"
+        return 0
+    fi
+    ok "mode $WANT"
+
     B=$(content query --uri content://media/external/images/media --projection _id --sort 'date_added DESC' 2>/dev/null | head -1)
-    say "mode requested: $MODE (check the viewfinder: the shutter coordinates come from the live layout)"
     say "media head before: $B"
 
     # Take the shutter rectangle from the running UI instead of hard-coding it: the pill moves between

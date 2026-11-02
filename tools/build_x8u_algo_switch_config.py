@@ -100,6 +100,8 @@ def main() -> int:
     parser.add_argument("--stock", required=True, type=Path)
     parser.add_argument("--reference", required=True, type=Path)
     parser.add_argument("--out", required=True, type=Path)
+    parser.add_argument("--envelope", action="store_true",
+                        help="wrap the result in the 01 01 envelope instead of writing plain text")
     args = parser.parse_args()
 
     stock_text = decode_stock(args.stock.read_bytes())
@@ -112,7 +114,8 @@ def main() -> int:
     after = {section: [item.get("mode") for item in stock.get(section, [])] for section in SECTIONS}
 
     args.out.parent.mkdir(parents=True, exist_ok=True)
-    args.out.write_text(json.dumps(stock, ensure_ascii=False, indent=4) + "\n", encoding="utf-8")
+    oplus_config.write(args.out, json.dumps(stock, ensure_ascii=False, indent=4) + "\n",
+                       envelope=args.envelope)
 
     print(f"stock file_version {stock.get('file_version')} aps_version {stock.get('aps_version')}")
     for section in SECTIONS:

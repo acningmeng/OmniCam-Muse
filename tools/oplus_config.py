@@ -21,6 +21,7 @@ DEFAULT_KEY works for both; `key_from_security()` recomputes it from a dump when
 
 from __future__ import annotations
 
+import hashlib
 import os
 from pathlib import Path
 
@@ -64,13 +65,27 @@ def encode(text: str, key: bytes = DEFAULT_KEY, salt: bytes | None = None,
     return MAGIC + salt + body + tail + b"\xff"
 
 
+def salt_for(text: str) -> tuple[bytes, bytes]:
+    """Deterministic salt for reproducible envelopes: sha256(text) split into 2 + 3 bytes.
+
+    Random salt would make two builds of the same table differ byte for byte, which breaks the
+    "regenerate and compare" checks; the camera does not care what the salt is.
+    """
+    digest = hashlib.sha256(text.encode("utf-8")).digest()
+    return digest[:2], digest[2:5]
+
+
 def read(path: Path, key: bytes = DEFAULT_KEY) -> str:
     return decode(Path(path).read_bytes(), key)
 
 
 def write(path: Path, text: str, key: bytes = DEFAULT_KEY, envelope: bool = False) -> int:
     """Write text as plain UTF-8, or wrapped when envelope=True. Returns the byte count."""
-    data = encode(text, key) if envelope else text.encode("utf-8")
+    if envelope:
+        salt, tail = salt_for(text)
+        data = encode(text, key, salt, tail)
+    else:
+        data = text.encode("utf-8")
     Path(path).write_bytes(data)
     return len(data)
 

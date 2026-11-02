@@ -72,8 +72,11 @@
 ## 4. 保留 / 重写的清单
 
 保留（已验证过、与本机无关的部分）：
-- `tools/symbols/port_x8u.py` + `app/src/main/assets/symbols.json` 的 4 条改动（`Zoom.labelBitmap=J6`、
-  `EffectItemView=if.s0$c`、`Personalized.style=i1`、`Personalized.labels=X0`）。
+- 符号层改成按机型分档：`tools/symbols/make_profile.py` 从 `app/src/main/assets/symbols.json`（X9U 原档，
+  不再就地改）派生出 `app/src/main/assets/profiles/x8u/{profile.json,symbols.json}`，4 条覆盖是
+  `Zoom.labelBitmap=J6`、`EffectItemView=if.s0$c`、`Personalized.style=i1`、`Personalized.labels=X0`。
+  运行时由 `SymbolProfile` 按 `Build.MODEL`（PKU110/PKJ110）+ 相机 versionName 选档，选不中回落原档；
+  原来的就地改写脚本 `tools/symbols/port_x8u.py` 已删除，避免两种做法并存。
 - `app/src/main/java/local/jiege/hook/common/FeatureModeCompat.java`（feature 表里缺某个 mode 的
   operation 表时补空 Map，避免 `CameraConfigHelper.getFeatureOperationMode` NPE）。
 - `module/device.sh` + `module/mount-state.sh`。
