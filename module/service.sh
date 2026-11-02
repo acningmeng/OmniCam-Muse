@@ -1,6 +1,7 @@
 #!/system/bin/sh
 
 MODDIR=${0%/*}
+LOG=$MODDIR/bind.log
 PREF_DIR=/data/user/0/com.oplus.camera/shared_prefs
 PREF_FILE="$PREF_DIR/override_config_data.xml"
 APP=/data/user/0/com.oplus.camera
@@ -11,6 +12,13 @@ GR_MARKED='1.2173913(28),1.7391304(40)'
 until [ -d "$APP" ]; do
     sleep 1
 done
+
+# Report the camera build here rather than in post-fs-data: this script runs as a late_start service,
+# so the package manager answers immediately instead of blocking the boot.
+MUSE_CAMERA_BUILD=$(dumpsys package com.oplus.camera 2>/dev/null | sed -n 's/.*versionName=\([0-9.]*\)/\1/p' | head -n 1)
+if [ -n "$MUSE_CAMERA_BUILD" ]; then
+    echo "camera build $MUSE_CAMERA_BUILD" >> "${LOG:-/dev/null}"
+fi
 
 APP_UID=$(stat -c %u "$APP")
 mkdir -p "$PREF_DIR"

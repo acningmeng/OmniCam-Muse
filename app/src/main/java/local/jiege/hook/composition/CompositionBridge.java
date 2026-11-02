@@ -6,6 +6,10 @@ import android.util.Log;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Locale;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
@@ -35,8 +39,27 @@ public final class CompositionBridge {
     private static final String SETTING = local.jiege.settings.ModuleSettings.AI_COMPOSITION;
 
     private static final long INTERVAL_MS = 500L;
+    /** How long a computed suggestion may be reused while the next frame is still being scored. */
+    private static final long RESULT_TTL_MS = 1500L;
     private static volatile long sLastRun;
     private static boolean sReportedFrameClass;
+
+    /**
+     * Scoring runs on its own thread and the result is applied to the <em>next</em> callback.
+     *
+     * The helper calls us on the preview thread, and {@link CompositionHeuristic#plan} walks every pixel,
+     * so doing it inline added ~10 ms to a 30 fps path. A result one frame late is invisible on a panel
+     * that updates twice a second, and the single worker with a busy flag coalesces frames: while one is
+     * being scored the rest are dropped instead of queued.
+     */
+    private static final ExecutorService WORKER = Executors.newSingleThreadExecutor(runnable -> {
+        Thread thread = new Thread(runnable, "muse-composition");
+        thread.setDaemon(true);
+        return thread;
+    });
+    private static final AtomicBoolean BUSY = new AtomicBoolean();
+    private static final AtomicReference<CompositionHeuristic.Suggestion> LATEST = new AtomicReference<>();
+    private static volatile long sLatestAt;
 
     private CompositionBridge() {
     }
@@ -102,6 +125,20 @@ public final class CompositionBridge {
 
     private static void handle(XC_MethodHook.MethodHookParam param) {
         long now = System.currentTimeMillis();
+
+        // Apply whatever the worker finished last; fail-open when it has nothing or it is stale.
+        CompositionHeuristic.Suggestion cached = LATEST.get();
+        if (cached != null && now - sLatestAt <= RESULT_TTL_MS) {
+            Object result = param.getResult();
+            boolean written = putIntoResult(result, cached);
+            if (!sReportedFrameClass) {
+                sReportedFrameClass = true;
+                Log.i(TAG, String.format(Locale.US, "reused score=%d tip=%s box=%s result=%s written=%s",
+                        cached.score, cached.tip, cached.boxJson(),
+                        result == null ? "null" : result.getClass().getName(), written));
+            }
+        }
+
         if (now - sLastRun < INTERVAL_MS) {
             return;
         }
@@ -110,34 +147,54 @@ public final class CompositionBridge {
             return;
         }
         sLastRun = now;
+        if (!BUSY.compareAndSet(false, true)) {
+            return; // a frame is already being scored; drop this one instead of queueing it
+        }
 
-        int sw = Math.min(frame.getWidth(), 320);
-        int sh = Math.max(8, frame.getHeight() * sw / Math.max(1, frame.getWidth()));
-        Bitmap small = null;
-        Bitmap src = frame;
-        if (frame.getWidth() > sw) {
-            try {
+        // Copy on the caller's thread: the camera owns this bitmap and may reuse it as soon as we return.
+        int[] pixels;
+        int w;
+        int h;
+        try {
+            int sw = Math.min(frame.getWidth(), 320);
+            int sh = Math.max(8, frame.getHeight() * sw / Math.max(1, frame.getWidth()));
+            Bitmap small = null;
+            Bitmap src = frame;
+            if (frame.getWidth() > sw) {
                 small = Bitmap.createScaledBitmap(frame, sw, sh, false);
                 src = small;
-            } catch (Throwable t) {
-                Log.w(TAG, "scale skipped: " + t);
             }
+            w = src.getWidth();
+            h = src.getHeight();
+            pixels = new int[w * h];
+            src.getPixels(pixels, 0, w, 0, 0, w, h);
+            if (small != null && small != frame) {
+                small.recycle();
+            }
+        } catch (Throwable t) {
+            Log.w(TAG, "frame copy skipped: " + t);
+            BUSY.set(false);
+            return;
         }
-        int w = src.getWidth();
-        int h = src.getHeight();
-        int[] pixels = new int[w * h];
-        src.getPixels(pixels, 0, w, 0, 0, w, h);
-        if (small != null && small != frame) {
-            small.recycle();
-        }
-        CompositionHeuristic.Suggestion s = CompositionHeuristic.plan(w, h, pixels);
 
-        Object result = param.getResult();
-        boolean written = putIntoResult(result, s);
-        if (!sReportedFrameClass) {
-            sReportedFrameClass = true;
-            Log.i(TAG, String.format(Locale.US, "first frame %dx%d score=%d tip=%s box=%s result=%s written=%s",
-                    w, h, s.score, s.tip, s.boxJson(), result == null ? "null" : result.getClass().getName(), written));
+        final int fw = w;
+        final int fh = h;
+        final int[] data = pixels;
+        try {
+            WORKER.execute(() -> {
+                try {
+                    CompositionHeuristic.Suggestion s = CompositionHeuristic.plan(fw, fh, data);
+                    LATEST.set(s);
+                    sLatestAt = System.currentTimeMillis();
+                } catch (Throwable t) {
+                    Log.w(TAG, "analysis failed: " + t);
+                } finally {
+                    BUSY.set(false);
+                }
+            });
+        } catch (Throwable t) {
+            Log.w(TAG, "worker rejected the frame: " + t);
+            BUSY.set(false);
         }
     }
 

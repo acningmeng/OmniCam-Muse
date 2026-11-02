@@ -36,14 +36,19 @@ esac
 
 # A firmware jump moves the vendor tables this payload was diffed against. Keep binding (the files are
 # rebased on the device's own tables, so a new build still only gains entries) and say so in bind.log.
-MUSE_CAMERA=$(dumpsys package com.oplus.camera 2>/dev/null | sed -n 's/.*versionName=\([0-9.]*\).*/\1/p' | head -n 1)
+# Off by default: the probe is for a manual `MUSE_PROBE_CAMERA=1 sh device.sh` run, not for
+# boot -- `dumpsys package` waits on system_server, which is what makes a module slow to boot.
+MUSE_CAMERA=${MUSE_CAMERA:-}
+if [ -z "$MUSE_CAMERA" ] && [ "${MUSE_PROBE_CAMERA:-0}" = 1 ]; then
+    MUSE_CAMERA=$(timeout 2 dumpsys package com.oplus.camera 2>/dev/null | sed -n 's/.*versionName=\([0-9.]*\)/\1/p' | head -n 1)
+fi
 
 case "$MUSE_PROFILE" in
     unknown)
         echo "device $MUSE_MODEL / $MUSE_FIRMWARE: no profile, config binds skipped" >> "${LOG:-/dev/null}"
         ;;
     x8u|x9u)
-        echo "device $MUSE_MODEL / $MUSE_FIRMWARE: profile $MUSE_PROFILE, camera ${MUSE_CAMERA:-unknown} (verified against $MUSE_EXPECTED_CAMERA)" >> "${LOG:-/dev/null}"
+        echo "device $MUSE_MODEL / $MUSE_FIRMWARE: profile $MUSE_PROFILE, expected camera $MUSE_EXPECTED_CAMERA (actual build is logged later by service.sh)" >> "${LOG:-/dev/null}"
         if [ -n "$MUSE_CAMERA" ] && [ "$MUSE_CAMERA" != "$MUSE_EXPECTED_CAMERA" ]; then
             echo "camera build differs from the verified one; config binds still apply, hooks may miss symbols" >> "${LOG:-/dev/null}"
         fi
